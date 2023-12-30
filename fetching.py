@@ -5,11 +5,8 @@ import pandas as pd
 breast_cancer_wisconsin_original = fetch_ucirepo(id=15) 
   
 # data (as pandas dataframes) 
-X = breast_cancer_wisconsin_original.data.features 
+x = breast_cancer_wisconsin_original.data.features 
 y = breast_cancer_wisconsin_original.data.targets 
-  
-# metadata 
-print(breast_cancer_wisconsin_original.metadata) 
-  
-# variable information 
-print(breast_cancer_wisconsin_original.variables) 
+
+# Fixing missing values appropiately (We only analyse the features given that every instance must have a target):
+x.fillna(method=bfill)
