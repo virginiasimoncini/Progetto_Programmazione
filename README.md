@@ -34,8 +34,3 @@ Abbiamo suddiviso il nostro codice in tre differenti passaggi:
 
 3. **Model	Evaluation:**
 
-1.**Data	Preprocessing:**
-
-2.**Model	Development**:
-
-3.**Model	Evaluation:**
