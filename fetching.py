@@ -89,10 +89,7 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
         geometric_mean = np.sqrt(sensitivity * specificity)
         evaluation_metrics['Geometric Mean'] = geometric_mean
 
-    # Stampa e restituisci le metriche di valutazione
-    for metric, value in evaluation_metrics.items():
-        print(f"{metric}: {value}")
-    return evaluation_metrics
+
 
     # Stampa e restituisci le metriche di valutazione
     for metric, value in evaluation_metrics.items():
