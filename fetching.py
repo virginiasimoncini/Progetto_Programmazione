@@ -16,16 +16,17 @@ def data_preprocessing():
     for column in x.columns: 
         x[column] = (x[column] - x[column].min()) / (x[column].max() - x[column].min())       
 
-    # Fixing missing values appropiately (We only analyse the features given that every instance must have a target):
+    # Fixing missing values appropriately (We only analyze the features given that every instance must have a target):
     x.bfill()
     print(x.head())
     print(y.head())
-    #return the targets and features
-    return x,y
+    # return the targets and features
+    return x, y
 
 
 # Definisco una funzione per valutare un modello di classificazione
-def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k=5, metrics=['accuracy']):
+# lo 02.2 indica che stai eseguendo la validazione Holdout con il 20% dei dati nel set di test. 
+def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k=5, metrics=['accuracy', 'error_rate', 'sensitivity', 'specificity', 'geometric_mean']):
     """
     Questa funzione valuta un modello di classificazione utilizzando Holdout o K-Fold Cross Validation.
 
@@ -43,6 +44,7 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
     """
 
     # Seleziona il tipo di validazione
+    # il validation type può essere passato come argomento alla funzione evaluate_model
     if validation_type == 'Holdout':
         # Holdout validation
         x_train, x_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=42)
@@ -55,6 +57,40 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
 
         # Genera le previsioni sul set di test
         predictions = model.predict(x_test)
+
+        ## Calcola le metriche specificate
+        evaluation_metrics = {}
+        # L'accuracy rappresenta la percentuale di predizioni corrette rispetto al totale delle predizioni.
+        if 'accuracy' in metrics:
+            accuracy = accuracy_score(y_test, predictions)
+            evaluation_metrics['Accuracy'] = accuracy
+        # L'error rate rappresenta la percentuale di predizioni errate rispetto al totale delle predizioni.
+        if 'error_rate' in metrics:
+            error_rate = 1 - accuracy
+            evaluation_metrics['Error Rate'] = error_rate
+        # La sensitivity rappresenta la percentuale di positivi veri correttamente identificati rispetto al totale dei positivi veri.
+        if 'sensitivity' in metrics:
+            sensitivity = recall_score(y_test, predictions)
+            evaluation_metrics['Sensitivity'] = sensitivity
+        # La specificity rappresenta la percentuale di negativi veri correttamente identificati rispetto al totale dei negativi veri.
+        if 'specificity' in metrics:
+            tn, fp, fn, tp = confusion_matrix(y_test, predictions).ravel()
+            specificity = tn / (tn + fp)
+            evaluation_metrics['Specificity'] = specificity
+        # Il geometric mean è la radice quadrata del prodotto di sensitivity e specificity.
+        if 'geometric_mean' in metrics:
+            geometric_mean = np.sqrt(sensitivity * specificity)
+            evaluation_metrics['Geometric Mean'] = geometric_mean
+
+
+
+        # Stampa e restituisci le metriche di valutazione
+        for metric, value in evaluation_metrics.items():
+            print(f"{metric}: {value}")
+ 
+        return evaluation_metrics
+
+
 
     elif validation_type == 'XX':
         # K-Fold Cross Validation
@@ -69,30 +105,3 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
 
         # Restituisce la media dei punteggi di Cross Validation
         return np.mean(scores)
-
-    # Calcola le metriche specificate
-    evaluation_metrics = {}
-    if 'accuracy' in metrics:
-        accuracy = accuracy_score(y_test, predictions)
-        evaluation_metrics['Accuracy'] = accuracy
-    if 'error_rate' in metrics:
-        error_rate = 1 - accuracy
-        evaluation_metrics['Error Rate'] = error_rate
-    if 'sensitivity' in metrics:
-        sensitivity = recall_score(y_test, predictions)
-        evaluation_metrics['Sensitivity'] = sensitivity
-    if 'specificity' in metrics:
-        tn, fp, fn, tp = confusion_matrix(y_test, predictions).ravel()
-        specificity = tn / (tn + fp)
-        evaluation_metrics['Specificity'] = specificity
-    if 'geometric_mean' in metrics:
-        geometric_mean = np.sqrt(sensitivity * specificity)
-        evaluation_metrics['Geometric Mean'] = geometric_mean
-
-
-
-    # Stampa e restituisci le metriche di valutazione
-    for metric, value in evaluation_metrics.items():
-        print(f"{metric}: {value}")
-
-    return evaluation_metrics
