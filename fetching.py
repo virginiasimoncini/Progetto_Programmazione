@@ -75,9 +75,24 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
     if 'accuracy' in metrics:
         accuracy = accuracy_score(y_test, predictions)
         evaluation_metrics['Accuracy'] = accuracy
+    if 'error_rate' in metrics:
+        error_rate = 1 - accuracy
+        evaluation_metrics['Error Rate'] = error_rate
     if 'sensitivity' in metrics:
         sensitivity = recall_score(y_test, predictions)
         evaluation_metrics['Sensitivity'] = sensitivity
+    if 'specificity' in metrics:
+        tn, fp, fn, tp = confusion_matrix(y_test, predictions).ravel()
+        specificity = tn / (tn + fp)
+        evaluation_metrics['Specificity'] = specificity
+    if 'geometric_mean' in metrics:
+        geometric_mean = np.sqrt(sensitivity * specificity)
+        evaluation_metrics['Geometric Mean'] = geometric_mean
+
+    # Stampa e restituisci le metriche di valutazione
+    for metric, value in evaluation_metrics.items():
+        print(f"{metric}: {value}")
+    return evaluation_metrics
 
     # Stampa e restituisci le metriche di valutazione
     for metric, value in evaluation_metrics.items():
