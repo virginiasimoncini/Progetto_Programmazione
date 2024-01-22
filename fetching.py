@@ -42,6 +42,14 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
     - Se validation_type è 'Holdout', restituisce un dizionario contenente le metriche calcolate.
     - Se validation_type è 'XX', stampa i punteggi di Cross Validation e restituisce la media di essi.
     """
+    validation_type = input("Inserisci il tipo di validazione ('Holdout' o 'XX' per Cross Validation): ") 
+
+     # Se l'utente mi inserisce un input che non sia tra i due che ho proposto io il codice mi deve "ciclare" finche non ho
+    # l'input giusto per iniziare il processo
+
+    while validation_type  != 'Holdout' and validation_type != 'XX':
+        validation_type = input("Input non valido. Inserisci il tipo di validazione ('Holdout' o 'XX' per Cross Validation): ")
+
 
     # Seleziona il tipo di validazione
     # il validation type può essere passato come argomento alla funzione evaluate_model
@@ -49,7 +57,7 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
         # Holdout validation
         x_train, x_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=42)
 
-        # Crea il modello K-NN con n_neighbors=k numero di vicini k
+        # Crea il modello K-NN con n_neighbors=k numero di vicini k con cui fare il "confronto" per unire
         model = KNeighborsClassifier(n_neighbors=k)
 
         # Addestra il modello sul set di addestramento, il .fit mette in relazione
@@ -58,7 +66,7 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
         # Genera le previsioni sul set di test
         predictions = model.predict(x_test)
 
-        ## Calcola le metriche specificate
+        # Calcola le metriche specificate
         evaluation_metrics = {}
         # L'accuracy rappresenta la percentuale di predizioni corrette rispetto al totale delle predizioni.
         if 'accuracy' in metrics:
@@ -73,10 +81,14 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
             sensitivity = recall_score(y_test, predictions)
             evaluation_metrics['Sensitivity'] = sensitivity
         # La specificity rappresenta la percentuale di negativi veri correttamente identificati rispetto al totale dei negativi veri.
+        #ravel() anzichè darmi la matrice mi da un vettore unico che contiene la matrice
+            
         if 'specificity' in metrics:
             tn, fp, fn, tp = confusion_matrix(y_test, predictions).ravel()
             specificity = tn / (tn + fp)
             evaluation_metrics['Specificity'] = specificity
+
+
         # Il geometric mean è la radice quadrata del prodotto di sensitivity e specificity.
         if 'geometric_mean' in metrics:
             geometric_mean = np.sqrt(sensitivity * specificity)
@@ -84,7 +96,7 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
 
 
 
-        # Stampa e restituisci le metriche di valutazione
+        # Stampa e restituisci le metriche di valutazione iterando e restituendo chiave:valore
         for metric, value in evaluation_metrics.items():
             print(f"{metric}: {value}")
  
