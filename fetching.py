@@ -25,8 +25,8 @@ def data_preprocessing():
 
 
 # Definisco una funzione per valutare un modello di classificazione
-# lo 02.2 indica che stai eseguendo la validazione Holdout con il 20% dei dati nel set di test. 
-def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k=5, metrics=['accuracy', 'error_rate', 'sensitivity', 'specificity', 'geometric_mean']):
+# lo 02.2 indica che stai eseguendo la validazione Holdout con il 20% dei dati nel set di test, nel caso si può mettere come input per scegliere. 
+def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, metrics=['accuracy', 'error_rate', 'sensitivity', 'specificity', 'geometric_mean']):
     """
     Questa funzione valuta un modello di classificazione utilizzando Holdout o K-Fold Cross Validation.
 
@@ -56,6 +56,7 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
     if validation_type == 'Holdout':
         # Holdout validation
         x_train, x_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=42)
+        k = int(input("Inserisci il numero di vicini (k): "))
 
         # Crea il modello K-NN con n_neighbors=k numero di vicini k con cui fare il "confronto" per unire
         model = KNeighborsClassifier(n_neighbors=k)
@@ -99,7 +100,13 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
         # Stampa e restituisci le metriche di valutazione iterando e restituendo chiave:valore
         for metric, value in evaluation_metrics.items():
             print(f"{metric}: {value}")
- 
+    
+                # Aggiungi le metriche al DataFrame
+        df_metrics_holdout = pd.DataFrame(evaluation_metrics, index=[0])
+
+        # Salva il DataFrame su un file Excel
+        df_metrics_holdout.to_excel("Risultati_evaluation_holdout.xlsx", index=False)
+
         return evaluation_metrics
 
 
@@ -115,5 +122,12 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, k
         print("Cross Validation Scores:", scores)
         print("Mean Accuracy:", np.mean(scores))
 
+        # Aggiungi la media al DataFrame
+        df_metrics_cv = pd.DataFrame({'Mean Accuracy': [(np.scores)]})
+
+        # Salva il DataFrame su un file Excel
+        df_metrics_cv.to_excel("Risultati_evaluation_cross_validation.xlsx", index=False)
+
         # Restituisce la media dei punteggi di Cross Validation
         return np.mean(scores)
+
