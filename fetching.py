@@ -56,7 +56,10 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, m
     if validation_type == 'Holdout':
         # Holdout validation
         x_train, x_test, y_train, y_test = train_test_split(features, target, test_size=test_size, random_state=42)
-        k = int(input("Inserisci il numero di vicini (k): "))
+        k = int(input('Inserisci il numero di vicini (k): '))
+        while k <= 0:
+            k = int(input('Il valore k indica i vicini per valutare il modello, inserisci un valore positivo: '))
+
 
         # Crea il modello K-NN con n_neighbors=k numero di vicini k con cui fare il "confronto" per unire
         model = KNeighborsClassifier(n_neighbors=k)
@@ -79,7 +82,7 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, m
             evaluation_metrics['Error Rate'] = error_rate
         # La sensitivity rappresenta la percentuale di positivi veri correttamente identificati rispetto al totale dei positivi veri.
         if 'sensitivity' in metrics:
-            sensitivity = recall_score(y_test, predictions)
+            sensitivity = recall_score(y_test, predictions,pos_label=4)
             evaluation_metrics['Sensitivity'] = sensitivity
         # La specificity rappresenta la percentuale di negativi veri correttamente identificati rispetto al totale dei negativi veri.
         #ravel() anzichè darmi la matrice mi da un vettore unico che contiene la matrice
