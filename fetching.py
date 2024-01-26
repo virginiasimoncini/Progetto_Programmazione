@@ -113,6 +113,7 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, m
 
     elif validation_type == 'XX':
         # K-Fold Cross Validation
+        k = int(input("Inserisci il numero di vicini (k): "))
         model = KNeighborsClassifier(n_neighbors=k)
 
         # Calcola i punteggi di Cross Validation
@@ -123,11 +124,14 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2, m
         print("Mean Accuracy:", np.mean(scores))
 
         # Aggiungi la media al DataFrame
-        df_metrics_cv = pd.DataFrame({'Mean Accuracy': [(np.scores)]})
+        df_metrics_cv = pd.DataFrame({'Mean Accuracy': [np.mean(scores)]})
 
         # Salva il DataFrame su un file Excel
         df_metrics_cv.to_excel("Risultati_evaluation_cross_validation.xlsx", index=False)
 
         # Restituisce la media dei punteggi di Cross Validation
         return np.mean(scores)
-
+    
+#uncomment per provare codice 
+#x,y = data_preprocessing()
+#metrics = evaluate_model(x,y)
