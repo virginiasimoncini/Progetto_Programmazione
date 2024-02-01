@@ -38,7 +38,7 @@ class KNNClassifier:
     most_common_labels = [label for label, count in zip(unique_labels, label_counts) if count == max_count]
             
 def predict_most_common_label(k_labels):
-    # Assicurati che k_labels non sia vuoto prima di tentare di trovare l'etichetta più comune
+    # Bisogna assicurarsi che k_labels non sia vuoto prima di tentare di trovare l'etichetta più comune
     if not k_labels:
         raise ValueError("L'array k_labels è vuoto. Assicurati di fornire dati validi.")
 
