@@ -1,0 +1,31 @@
+import numpy as np
+
+class KNNClassifier:
+    def __init__(self, k):
+        # Inizializza un'istanza del classificatore KNN con il parametro k specificato
+        self.k = k
+
+    def fit(self, X, y):
+       # Memorizza i dati di addestramento
+        self.X_train = X
+        self.y_train = y
+
+    def euclidean_distance(self, x1, x2):
+        # Calcola la distanza euclidea tra due vettori
+        return np.sqrt(np.sum((x1 - x2) ** 2))
+
+    def predict(self, X):
+        y_pred = []
+        for x in X:
+            # Calcola le distanze tra il dato di test e tutti i dati di addestramento
+            distances = [self.euclidean_distance(x, x_train) for x_train in self.X_train]
+
+            # Trova gli indici dei k vicini più prossimi
+            k_indices = np.argsort(distances)[:self.k]
+
+            # Ottieni le etichette corrispondenti agli indici trovati
+            k_labels = [self.y_train[i] for i in k_indices]
+            
+            # Trova l'etichetta più comune tra i k vicini più prossimi
+            y_pred.append(max(set(k_labels), key=k_labels.count))
+        return y_pred
