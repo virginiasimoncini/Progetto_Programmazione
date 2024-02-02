@@ -1,7 +1,33 @@
 from fetching import data_preprocessing
-from knn_model import knn_predict
+from knn import knn_predict
 import pandas as pd
 import numpy as np
+
+
+def accuracy_score(y_true, y_pred):
+    correct_predictions = np.sum(y_true == y_pred)
+    total_predictions = len(y_true)
+    accuracy = correct_predictions / total_predictions
+    return accuracy
+
+def error_rate(y_true, y_pred):
+    return 1 - accuracy_score(y_true, y_pred)
+
+def recall_score(y_true, y_pred, pos_label):
+    true_positives = np.sum((y_true == pos_label) & (y_pred == pos_label))
+    actual_positives = np.sum(y_true == pos_label)
+    recall = true_positives / actual_positives
+    return recall
+
+def specificity(y_true, y_pred):
+    true_negatives = np.sum((y_true != 4) & (y_pred != 4))
+    actual_negatives = np.sum(y_true != 4)
+    specificity = true_negatives / actual_negatives
+    return specificity
+
+def geometric_mean(sensitivity, specificity):
+    g_mean = np.sqrt(sensitivity * specificity)
+    return g_mean
 def evaluate_model(features, target, validation_type='Holdout', test_size=0.2):
 
     features, target = data_preprocessing()
@@ -17,10 +43,10 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2):
 
         # Calcolo delle metriche di valutazione
         accuracy = accuracy_score(y_test, predictions)
-        error_rate = error_rate_manual(y_test, predictions)
-        recall = recall_score_manual(y_test, predictions, pos_label=4)  # Assumendo da traccai 4 come maligno
-        specificity = specificity_manual(y_test, predictions)
-        g_mean = geometric_mean_manual(sensitivity=recall, specificity=specificity)
+        error_rate = error_rate(y_test, predictions)
+        recall = recall_score(y_test, predictions, pos_label=4)  # Assumendo da traccai 4 come maligno
+        specificity = specificity(y_test, predictions)
+        g_mean = geometric_mean(sensitivity=recall, specificity=specificity)
 
         # Stampo le metriche
         print(f"Accuracy: {accuracy}")
