@@ -29,13 +29,14 @@ Di seguito una panoramica dettagliata del dataset:
 Abbiamo suddiviso il nostro codice in tre differenti passaggi: 
 
 1. **Data	Preprocessing:**
-This branch process the dataset.Its steps are:
+Questo branch elabora il dataset. Di seguito i passaggi:
     - **Load the dataset:**
-        We import the dataset from a file called `breast_cancer.csv`
+       Importiamo il set di dati dal file chiamato `breast_cancer.csv`
     - **Divide dataset in features and targets:**
-We pop the "Class" column from the dataframe and assign it to the Y variable. Then we assign the rest of the dataframe to the X variable.
+Estraiamo la colonna "Classe" dal dataframe e la assegniamo alla variabile Y. Quindi assegniamo il resto del dataframe alla variabile X.
     - **Process missing values appropiately:**
-We must take into account the missing values in the features dataset. For this we have used the "blackfill" method.
+Dobbiamo tenere conto dei valori mancanti nel set del dataset delle features. Per questo abbiamo utilizzato il metodo "blackfill".
+
 2. **Model	Development**
 
 3. **Model	Evaluation:**
