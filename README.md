@@ -7,6 +7,16 @@ Con Cross-Validation il dataset si divide in k set che si comparano tra loro in 
 
 Si importano le logiche implementate negli altri branch rispettivamente il caricamento del dataset fornito e la logica per la gestione e organizzazione del processo.
 
+## File importati e implementazione del file di valutazione finale e livrerie utilizzate.
+fetching.py: Modulo per il preprocessing e il caricamento dei dati.
+knn.py: Implementazione del classificatore KNN (KNNClassifier), funzioni di previsione e funzioni di utilità.
+evaluate_model.py: Script per valutare il modello KNN utilizzando Holdout e K-Fold Cross Validation.
+
+Per ognuno di questi py file si sono utilizzate le seguenti librerie:
+Numpy as np come libreria ufficiale di Python con le quali si sono trattati tutti i dati e funzioni.
+Python come linguaggio di programmazione orientato agli oggetti.
+Pandas come libreria di Python open source, potente e popolare, usata per la manipolazione e l'analisi dei dati.
+
 ## Holdout
 In questo caso si fornisce un parametro k ovvero il numero dei vicini e si calcolano le metriche specifiche tramite le previsioni che si ricavano dal dataset.
 Si utilizza random_state=42 per fornire all'utente una combinazione che effettua 42 possibili comparazioni in maniera tale da seguire lo sviluppo di ognuna e confrontarla quando si cambiano i test e train.
