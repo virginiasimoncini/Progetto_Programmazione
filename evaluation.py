@@ -43,6 +43,7 @@ def custom_train_test_split(features, target, test_size=0.2, random_state=42):
     x_train, x_test = features.iloc[train_indices], features.iloc[test_indices]
     # è un DataFrame contenente le righe corrispondenti al set di addestramento di features, 
     # e x_test è un DataFrame contenente le righe corrispondenti al set di test di features.
+    
     y_train, y_test = target.iloc[train_indices], target.iloc[test_indices]
     # y_train conterrà le etichette corrispondenti al set di addestramento, e y_test conterrà le etichette corrispondenti al set di test.
 
@@ -53,9 +54,11 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2):
     k = int(input('Inserisci il valore di k (vicini) per il modello KNN: '))
     
     if validation_type == 'Holdout':
+        
         # Split del dataset in training e test set utilizzando la nuova funzione custom_train_test_split
         # L'utilizzo di un valore specifico come 42 per random_state assicura che la suddivisione sia riproducibile (riproduce 42 test 
         # "ripetuti" in modo da tener conto il progresso/sviluppo)
+        
         x_train, x_test, y_train, y_test = custom_train_test_split(features, target, test_size=test_size, random_state=42)
 
         # Previsione utilizzando il KNN implementato in model_development
@@ -102,14 +105,19 @@ def evaluate_model(features, target, validation_type='Holdout', test_size=0.2):
 
         for i in range(k):
             # Divisione del dataset in training e test set per ogni fold
-            test_start, test_end = i * fold_length, (i + 1) * fold_length #Determina gli indici di inizio e fine per il set di test
+            
+            test_start, test_end = i * fold_length, (i + 1) * fold_length 
+            #Determina gli indici di inizio e fine per il set di test
             #nell'iterazione corrente del ciclo.
+            
             test_features, test_target = features_mixed.iloc[test_start:test_end], target_mixed.iloc[test_start:test_end]
             # Estrae il set di test utilizzando gli indici calcolati in precedenza. test_features rappresenta le feature del set di test,
             # e test_target rappresenta i corrispondenti target.
+            
             train_features = pd.concat([features_mixed.iloc[:test_start], features_mixed.iloc[test_end:]])
             #Crea il set di addestramento unendo le parti del dataset che non sono nel set di test. Questo è fatto prendendo le righe dal principio del dataset
             #fino a test_start e concatenandole con le righe da test_end fino alla fine del dataset.
+            
             train_target = pd.concat([target_mixed.iloc[:test_start], target_mixed.iloc[test_end:]])
             #Crea il target di addestramento in modo analogo alle feature.
 
