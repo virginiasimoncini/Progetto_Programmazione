@@ -1,4 +1,4 @@
-# Valutazione del Modello implentato
+# Valutazione del Modello implementato
 ## Descrizione
 Questo modulo fornisce funzionalità per la valutazione del modello di classificazione del cancro al seno basato su k-Nearest Neighbors (KNN).
 Si sono utilizzati due possibili tecniche di valutazione: Holdout e Cross-Validation.
