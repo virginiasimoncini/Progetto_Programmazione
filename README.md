@@ -7,7 +7,7 @@ Con Cross-Validation il dataset si divide in k set che si comparano tra loro in 
 
 Si importano le logiche implementate negli altri branch rispettivamente il caricamento del dataset fornito e la logica per la gestione e organizzazione del processo.
 
-## File importati e implementazione del file di valutazione finale e livrerie utilizzate.
+## File importati e implementazione del file di valutazione finale e librerie utilizzate.
 fetching.py: Modulo per il preprocessing e il caricamento dei dati.
 knn.py: Implementazione del classificatore KNN (KNNClassifier), funzioni di previsione e funzioni di utilità.
 evaluate_model.py: Script per valutare il modello KNN utilizzando Holdout e K-Fold Cross Validation.
