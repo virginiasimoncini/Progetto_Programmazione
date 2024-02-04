@@ -25,15 +25,24 @@ Di seguito una panoramica dettagliata del dataset:
 
 **Classe**: Classificazione del tumore (2 per benigno, 4 per maligno).
 
+## Dipendenze necessarie per il codice
+In ogni parte del codice si sono utilizzate le principali librerie che Python offre:
+
+**Numpy** importato as np tramite la quale si sono trattati tutti i dati e funzioni.
+
+**Pandas** importato as pd per la manipolazione e la gestione dei dati.
+
+Le dipendenze sopra riportate si possono installare tramite  `pip install -r requirements.txt` direttamente dal terminale, con questo comando sarà possibile gestire le principali librerie.
+
 ## Analisi del codice
 Abbiamo suddiviso il nostro codice in tre differenti passaggi: 
 
 1. **Data	Preprocessing:**
 Questo branch elabora il dataset. Di seguito i passaggi:
     - **Load the dataset:**
-       Importiamo il set di dati dal file chiamato `breast_cancer.csv`
+       Importiamo il set di dati dal file chiamato `breast_cancer.csv` già compilato e gestito.
     - **Divide dataset in features and targets:**
-Estraiamo la colonna "Classe" dal dataframe e la assegniamo alla variabile Y. Quindi assegniamo il resto del dataframe alla variabile X.
+Estraiamo la colonna "Classe" dal dataframe e la assegniamo alla variabile Y. Quindi assegniamo il resto del dataframe alla variabile X. Con questa operazione abbiamo potuto gestire le variabili indipendenti e quelle dipendenti.
     - **Process missing values appropiately:**
 Dobbiamo tenere conto dei valori mancanti nel set del dataset delle features. Per questo abbiamo utilizzato il metodo "blackfill".
 
