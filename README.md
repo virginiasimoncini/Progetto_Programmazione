@@ -34,6 +34,12 @@ In ogni parte del codice si sono utilizzate le principali librerie che Python of
 
 Le dipendenze sopra riportate si possono installare tramite  `pip install -r requirements.txt` direttamente dal terminale, con questo comando sarà possibile gestire le principali librerie.
 
+## Algoritmo utilizzato: K-Nearest Neighbors 
+L'algoritmo K-nearest neighbor (KNN) è una tecnica di classificazione che opera valutando le caratteristiche di oggetti vicini a quello in esame. Il KNN classifica un oggetto in base alla sua somiglianza con altri oggetti conosciuti nel set di dati. Ciò avviene calcolando la distanza tra le caratteristiche dell'oggetto da classificare e quelle degli oggetti già presenti nel sistema. Utilizzando i "k" oggetti più vicini, l'algoritmo determina la classe dell'oggetto in esame.
+Per identificare i vicini più vicini a un punto di query, KNN calcola la distanza tra il punto di query e gli altri punti dati nel set di dati. Tra le varie misure di distanza, spesso quella utilizzata è la **distanza euclidea**, ma possono essere utilizzate altre metriche di distanza a seconda del problema.
+
+Il **parametro k** rappresenta il numero di vicini più prossimi che vengono considerati quando si prende una decisione sulla classificazione per un nuovo punto dato. Prima di applicare l'algoritmo KNN, è necessario decidere il valore di "k". Il valore di "k" non deve essere nè troppo piccolo nè troppo grande per evitare overfitting o underfitting. 
+
 ## Analisi del codice
 Abbiamo suddiviso il nostro codice in tre differenti passaggi: 
 
