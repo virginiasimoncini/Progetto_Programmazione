@@ -47,11 +47,11 @@ Per l'installazione delle librerie è necessario digitare da terminale i seguent
 
  * `pip install -r requirements.txt` per gestire le dipendenze.
  * Python legge il contenuto di requirements.txt e installa i pacchetti elencati con le versioni specificate.
- * 
+   
  * `pip install pandas matplotlib` per Matplot.
- * 
+  
  * `pip install numpy` per Numpy.
- * 
+   
  * `pip install pandas` per Pandas.
 
 
