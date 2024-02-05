@@ -1,11 +1,13 @@
 import numpy as np
 
 class KNNClassifier:
+
     def __init__(self, k, X, y):
         # Inizializza un'istanza del classificatore KNN con il parametro k specificato
         self.k = k
-        self.X_train = X
-        self.y_train = y   
+
+    # self.X_train e self.y_train memorizzano i dati di addestramento all'interno dell'istanza della classe. 
+    # Dopo aver chiamato fit sulla tua istanza della classe, accedo ai dati di addestramento tramite self.X_train e self.y_train.
 
     def euclidean_distance(self, x1, x2):
         # Calcola la distanza euclidea tra due vettori
@@ -23,17 +25,20 @@ class KNNClassifier:
             # Ottieni le etichette corrispondenti agli indici trovati
             k_labels = [self.y_train[i] for i in k_indices]
 
+
         return k_labels
     # Supponiamo che k_labels sia un array contenente le etichette (labels) assegnate a qualche insieme di dati.
+            # Calcola gli elementi unici e le loro frequenze all'interno dell'array k_labels.
+            unique_labels, label_counts = np.unique(k_labels, return_counts=True)
 
-    # Calcola gli elementi unici e le loro frequenze all'interno dell'array k_labels.
-    unique_labels, label_counts = np.unique(k_labels, return_counts=True)
+            # Trova la frequenza massima tra tutte le etichette.
+            max_count = np.max(label_counts)
 
-    # Trova la frequenza massima tra tutte le etichette.
-    max_count = np.max(label_counts)
+            # Crea una lista contenente le etichette più comuni, ovvero quelle con la frequenza massima.
+            most_common_labels = [label for label, count in zip(unique_labels, label_counts) if count == max_count]
 
-    # Crea una lista contenente le etichette più comuni, ovvero quelle con la frequenza massima.
-    most_common_labels = [label for label, count in zip(unique_labels, label_counts) if count == max_count]
+            # Aggiungi le etichette più comuni alla lista y_pred
+            y_pred.append(most_common_labels)
             
     def predictX(self, X):
         k_labels = self.getKClosestLabels(self, X)
