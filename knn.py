@@ -3,7 +3,8 @@ import numpy as np
 class KNNClassifier:
     def __init__(self, k):
         # Definizione del default constructor, k è il numero di vicini da considerare
-
+        self.k = k
+        
     def fit(self, X, y):
         # Memorizza i dati di addestramento
         self.X_train = X
