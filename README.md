@@ -66,4 +66,3 @@ We must take into account the missing values in the features dataset. For this w
 
 3. **Model	Evaluation:**
 
->>>>>>>>> Temporary merge branch 2
