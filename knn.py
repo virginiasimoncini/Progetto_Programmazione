@@ -2,20 +2,22 @@ import numpy as np
 
 class KNNClassifier:
     def __init__(self, k):
-        # Inizializza un'istanza del classificatore KNN con il parametro k specificato
-        self.k = k
+        # Definizione del default constructor, k è il numero di vicini da considerare
 
     def fit(self, X, y):
         # Memorizza i dati di addestramento
         self.X_train = X
         self.y_train = y
 
+    # self.X_train e self.y_train memorizzano i dati di addestramento all'interno dell'istanza della classe. 
+    # Dopo aver chiamato fit sulla tua istanza della classe, accedo ai dati di addestramento tramite self.X_train e self.y_train.
+
     def euclidean_distance(self, x1, x2):
         # Calcola la distanza euclidea tra due vettori
         return np.sqrt(np.sum((x1 - x2) ** 2))
 
     def predict(self, X):
-        y_pred = []
+        y_pred = [] # è la lista vuota che verrà utilizzata per memorizzare le previsioni del modello per ciascun dato di input in X
         for x in X:
             # Calcola le distanze tra il dato di test e tutti i dati di addestramento
             distances = [self.euclidean_distance(x, x_train) for x_train in self.X_train]
