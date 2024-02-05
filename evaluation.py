@@ -88,22 +88,10 @@ class ModelEvaluator:
             for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
                 accuracy, error_rate, specificity, g_mean = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
                 accuracies.append(accuracy)
-                error_rates.append(error_rate)
-                specificities.append(specificity)
-                g_means.append(g_mean)
 
                 print(f"Fold {i + 1} Accuracy: {accuracy:.4f}")
-                print(f"Fold {i + 1} Error Rate: {error_rate:.4f}")
-                print(f"Fold {i + 1} Specificity: {specificity:.4f}")
-                print(f"Fold {i + 1} Geometric Mean: {g_mean:.4f}")
 
             mean_accuracy = np.mean(accuracies)
-            mean_error_rate = np.mean(error_rates)
-            mean_specificity = np.mean(specificities)
-            mean_g_mean = np.mean(g_means)
 
             print(f"\nMean Accuracy across {self.k} folds: {mean_accuracy:.4f}")
-            print(f"Mean Error Rate across {self.k} folds: {mean_error_rate:.4f}")
-            print(f"Mean Specificity across {self.k} folds: {mean_specificity:.4f}")
-            print(f"Mean Geometric Mean across {self.k} folds: {mean_g_mean:.4f}")
 
