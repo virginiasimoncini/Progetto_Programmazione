@@ -43,11 +43,12 @@ class KNNClassifier:
             
         return np.array(y_pred)
             
-    def predictX(self, X):
-        k_labels = self.getKClosestLabels(self, X)
+    def predict_most_common_label(k_labels):
         # Bisogna assicurarsi che k_labels non sia vuoto prima di tentare di trovare l'etichetta più comune
         if not k_labels:
             raise ValueError("L'array k_labels è vuoto. Assicurati di fornire dati validi.")
+
         # Trova l'etichetta più comune tra i k vicini più prossimi
         most_common_label = max(set(k_labels), key=k_labels.count)
+        
         return most_common_label
