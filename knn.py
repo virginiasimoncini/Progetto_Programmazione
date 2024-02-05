@@ -1,10 +1,20 @@
 import numpy as np
 
 class KNNClassifier:
+<<<<<<< HEAD
 
     def __init__(self, k, X, y):
         # Inizializza un'istanza del classificatore KNN con il parametro k specificato
         self.k = k
+=======
+    def __init__(self, k):
+        # Definizione del default constructor, k è il numero di vicini da considerare
+
+    def fit(self, X, y):
+        # Memorizza i dati di addestramento
+        self.X_train = X
+        self.y_train = y
+>>>>>>> parent of e777bbb (Update knn.py)
 
     # self.X_train e self.y_train memorizzano i dati di addestramento all'interno dell'istanza della classe. 
     # Dopo aver chiamato fit sulla tua istanza della classe, accedo ai dati di addestramento tramite self.X_train e self.y_train.
