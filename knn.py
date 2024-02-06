@@ -17,38 +17,53 @@ class KNNClassifier:
         # Calcola la distanza euclidea tra due vettori
         return np.sqrt(np.sum((x1 - x2) ** 2))
 
-    def predict(self, X):
-        y_pred = []
-        for x in X:
-            # Calcola le distanze tra il dato di test e tutti i dati di addestramento
-            distances = [self.euclidean_distance(x, x_train) for x_train in self.X_train]
+    def model_prediction(self, X):
+    y_predictions = [] #Lista dove veranno salvate le previsioni
+   for _, test_point in x_test.iterrows(): 
+            distances = [] # Elenco delle distanze tra il punto x_test e i punti X
+            for index, train_point in self.x_train.iterrows():
+        # Calcola le distanze tra il dato di x_test e i dati di X
+        distances = [self.calculate_euclidean_distance(train_point, test_point)
+        distances.append(((dist),self.y_train[index]))
 
-            # Trova gli indici dei k vicini più prossimi
-            k_indices = np.argsort(distances)[:self.k]
+          # Ordina le distanze in ordine crescente
+           distances= sorted(distances, key=itemgetter(0), reverse=False)
 
-            # Ottieni le etichette corrispondenti agli indici trovati
-            k_labels = [self.y_train[i] for i in k_indices]
+           # Seleziona le prime k distanze
+           k_nearest_neighbors = distances[:self.k]
 
-            # Calcola gli elementi unici e le loro frequenze all'interno dell'array k_labels.
-            unique_labels, label_counts = np.unique(k_labels, return_counts=True)
+          # Estrae le classi corrispondenti ai k vicini più vicini
+          k_neighbor_classes = [neighbor[1] for neighbor in k_nearest_neighbors]
 
-            # Trova la frequenza massima tra tutte le etichette.
-            max_count = np.max(label_counts)
+         # Supponendo che 'k_neighbors' sia la lista delle classi corrispondenti ai k vicini più prossimi
+           unique_elements, counts_elements = np.unique(k_neighbors_classes, return_counts=True)
+         # unique_elements contiene i valori della colonna target
+         # counts_elements contiene il numero di volte che compare quel valore della colonna target
 
-            # Crea una lista contenente le etichette più comuni, ovvero quelle con la frequenza massima.
-            most_common_labels = [label for label, count in zip(unique_labels, label_counts) if count == max_count]
+            # Verifica se c'è solo una classe tra i k vicini più prossimi
+            # o se c'è un pareggio tra le occorrenze delle classi
+            if len(unique_elements) == 1 or np.max(counts_elements) == np.min(counts_elements):
+                # Se c'è solo una classe o c'è un pareggio, scegli in modo casuale
+                random_choice = np.random.choice(unique_elements)
+                # Aggiungi la scelta casuale alle previsioni
+                y_predictions.append(random_choice)
+            else:
+                # Altrimenti, scegli la classe più frequente
+                max_index = np.argmax(counts_elements) 
+                # Trova l'indice della classe con il numero massimo di occorrenze tra i k vicini più prossimi
+                y_predictions.append(unique_elements[max_index]) 
+                # Aggiunge la classe corrispondente all'indice trovato alle previsioni
 
-            # Aggiungi l'etichetta più comune alla lista y_pred
-            y_pred.append(most_common_labels[0] if most_common_labels else None)
-            
-        return np.array(y_pred)
-            
-    def predict_most_common_label(k_labels):
-        # Bisogna assicurarsi che k_labels non sia vuoto prima di tentare di trovare l'etichetta più comune
-        if not k_labels:
-            raise ValueError("L'array k_labels è vuoto. Assicurati di fornire dati validi.")
 
-        # Trova l'etichetta più comune tra i k vicini più prossimi
-        most_common_label = max(set(k_labels), key=k_labels.count)
+              return np.array(y_predictions) # questa funzione restituisce le previsioni convertite in un array NumPy
+
+
+
+
+       
+
+
         
-        return most_common_label
+
+            
+   
