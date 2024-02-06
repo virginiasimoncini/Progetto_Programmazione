@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from fetching import data_preprocessing
-from knn import KNNClassifier, knn_predict
+from knn import KNNClassifier
 import matplotlib.pyplot as plt
 
 class Holdout:
