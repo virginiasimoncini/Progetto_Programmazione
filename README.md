@@ -1,4 +1,4 @@
-<<<<<<<<< Temporary merge branch 1
+
 # Data preprocessing
 This branch process the dataset.Its steps are:
 ### Load the dataset:
@@ -35,8 +35,24 @@ Di seguito una panoramica dettagliata del dataset:
 
 **Classe**: Classificazione del tumore (2 per benigno, 4 per maligno).
 
-## Analisi del codice
-Abbiamo suddiviso il nostro codice in tre differenti passaggi: 
+## Librerie utilizzate.
+
+Numpy importata come np come libreria ufficiale di Python con le quali si sono trattati tutti i dati e funzioni.
+
+Pandas importata come pd usata per la manipolazione e l'analisi dei dati.
+
+Matplotlib.pyplot importata come plt per fornire all'utenza una visualizzazione grafica.
+
+Per l'installazione delle librerie è necessario digitare da terminale i seguenti comandi:
+
+ * `pip install -r requirements.txt` per gestire le dipendenze.
+ * Python legge il contenuto di requirements.txt e installa i pacchetti elencati con le versioni specificate.
+ * `pip install pandas matplotlib` per Matplot.
+ * `pip install numpy` per Numpy.
+ * `pip install pandas` per Pandas.
+
+
+
 
 1. **Data	Preprocessing:**
 This branch process the dataset.Its steps are:
@@ -50,4 +66,3 @@ We must take into account the missing values in the features dataset. For this w
 
 3. **Model	Evaluation:**
 
->>>>>>>>> Temporary merge branch 2
