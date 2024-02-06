@@ -2,7 +2,9 @@ import pandas as pd
 
 def data_preprocessing():
     # fetch dataset 
-    df = pd.read_csv("breast_cancer.csv") 
+    df = pd.read_csv(r"C:\Users\Debora\Desktop\breast_cancer.csv")
+
+
   
     # data (as pandas dataframes)
     y = df.pop("Class")

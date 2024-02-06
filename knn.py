@@ -1,4 +1,5 @@
 import numpy as np
+from operator import itemgetter
 
 class KNNClassifier:
     def __init__(self, k):
@@ -18,27 +19,25 @@ class KNNClassifier:
         return np.sqrt(np.sum((x1 - x2) ** 2))
 
     def model_prediction(self, X):
-    y_predictions = [] #Lista dove veranno salvate le previsioni
-   for _, test_point in x_test.iterrows(): 
+        y_predictions = [] # Lista dove verranno salvate le previsioni
+        for _, test_point in X.iterrows(): 
             distances = [] # Elenco delle distanze tra il punto x_test e i punti X
-            for index, train_point in self.x_train.iterrows():
-        # Calcola le distanze tra il dato di x_test e i dati di X
-        distances = [self.calculate_euclidean_distance(train_point, test_point)
-        distances.append(((dist),self.y_train[index]))
+            for index, train_point in self.X_train.iterrows():
+                # Calcola le distanze tra il dato di x_test e i dati di X
+                dist = self.euclidean_distance(train_point, test_point)
+                distances.append((dist, self.y_train[index]))
 
-          # Ordina le distanze in ordine crescente
-           distances= sorted(distances, key=itemgetter(0), reverse=False)
+            # Ordina le distanze in ordine crescente
+            distances = sorted(distances, key=itemgetter(0), reverse=False)
 
-           # Seleziona le prime k distanze
-           k_nearest_neighbors = distances[:self.k]
+            # Seleziona le prime k distanze
+            k_nearest_neighbors = distances[:self.k]
 
-          # Estrae le classi corrispondenti ai k vicini più vicini
-          k_neighbor_classes = [neighbor[1] for neighbor in k_nearest_neighbors]
+            # Estrae le classi corrispondenti ai k vicini più vicini
+            k_neighbor_classes = [neighbor[1] for neighbor in k_nearest_neighbors]
 
-         # Supponendo che 'k_neighbors' sia la lista delle classi corrispondenti ai k vicini più prossimi
-           unique_elements, counts_elements = np.unique(k_neighbors_classes, return_counts=True)
-         # unique_elements contiene i valori della colonna target
-         # counts_elements contiene il numero di volte che compare quel valore della colonna target
+            # Supponendo che 'k_neighbors' sia la lista delle classi corrispondenti ai k vicini più prossimi
+            unique_elements, counts_elements = np.unique(k_neighbor_classes, return_counts=True)
 
             # Verifica se c'è solo una classe tra i k vicini più prossimi
             # o se c'è un pareggio tra le occorrenze delle classi
@@ -54,8 +53,8 @@ class KNNClassifier:
                 y_predictions.append(unique_elements[max_index]) 
                 # Aggiunge la classe corrispondente all'indice trovato alle previsioni
 
+        return np.array(y_predictions) # questa funzione restituisce le previsioni convertite in un array NumPy
 
-              return np.array(y_predictions) # questa funzione restituisce le previsioni convertite in un array NumPy
 
 
 
