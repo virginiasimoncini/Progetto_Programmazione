@@ -14,8 +14,16 @@ holdout_validation = Holdout(test_size=0.2, random_state=42)
 # Chiedi all'utente di fornire il numero di vicini
 k_neighbors = int(input("Inserisci il numero di vicini (k): "))
 
+# Puoi gestire le ecc con un while se necessario sia per la valid_type che per il k per catturare l'excp
+
+# Puoi inserire un numero n di quanti "miniset" gestire
+
+num_folds = int(input("Inserisci il numero di folds per la cross-validation: "))
+
 # Crea l'oggetto XXCrossValidation senza specificare il valore di k
-crossval_validation = XXCrossValidation(k=k_neighbors)
+crossval_validation = XXCrossValidation(k=num_folds)
+
+
 
 # Chiedi all'utente di fornire il tipo di validazione
 validation_type = input("Scegli il tipo di validazione (holdout/crossval): ").lower()
