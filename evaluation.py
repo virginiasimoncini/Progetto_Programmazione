@@ -22,25 +22,62 @@ class Holdout:
         return train_set, test_set
 
 class XXCrossValidation:
-    def __init__(self, k):
-        self.k = k
+    def __init__(self, num_folds, num_executions=1):
+        """
+        Inizializza l'oggetto XXCrossValidation.
+
+        Parameters:
+        - num_folds (int): Numero di fold nella cross-validation.
+        - num_executions (int): Numero totale di esecuzioni della cross-validation.
+
+        """
+        self.num_folds = num_folds
+        self.num_executions = num_executions
 
     def split(self, df):
+        """
+        Suddivide il DataFrame in fold per la cross-validation.
+
+        Parameters:
+        - df (pd.DataFrame): Il DataFrame contenente i dati.
+
+        Returns:
+        - folds (list): Una lista di tuple, ognuna contenente un set di addestramento e un set di test.
+
+        """
         folds = []
 
+        # Imposta il seed per la riproducibilità
         np.random.seed(42)
+
+        # Ottiene gli indici del DataFrame in modo casuale
         indices = np.random.permutation(df.index)
+
+        # Mescola le righe del DataFrame
         features_mixed = df.loc[indices]
 
-        fold_length = len(df) // self.k
+        # Calcola la lunghezza di ciascun fold
+        fold_length = len(df) // self.num_folds
 
-        for i in range(self.k):
-            test_start, test_end = i * fold_length, (i + 1) * fold_length 
-            test_set = features_mixed.iloc[test_start:test_end]
-            train_set = pd.concat([features_mixed.iloc[:test_start], features_mixed.iloc[test_end:]])
-            folds.append((train_set, test_set))
+        # Itera sul numero totale di esecuzioni della cross-validation
+        for i in range(self.num_executions):
+            # Itera su ogni fold
+            for j in range(self.num_folds):
+                # Calcola gli indici di inizio e fine del fold
+                test_start, test_end = j * fold_length, (j + 1) * fold_length 
+                
+                # Ottiene il set di test
+                test_set = features_mixed.iloc[test_start:test_end]
+                
+                # Ottiene il set di addestramento concatenando le parti del DataFrame escludendo il fold di test
+                train_set = pd.concat([features_mixed.iloc[:test_start], features_mixed.iloc[test_end:]])
+                
+                # Aggiunge la tupla al risultato
+                folds.append((train_set, test_set))
 
         return folds
+
+
 
 class ModelEvaluator:
     def __init__(self, X, y, validation, k=None):
