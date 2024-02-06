@@ -10,16 +10,17 @@ class Holdout:
         self.random_state = random_state
 
     def split(self, df):
-        np.random.seed(self.random_state)
-        shuffled_indices = np.random.permutation(len(df))
-        test_set_size = int(len(df) * self.test_size)
-        test_indices = shuffled_indices[:test_set_size]
-        train_indices = shuffled_indices[self.test_size:]
+       np.random.seed(self.random_state)
+       shuffled_indices = np.random.permutation(len(df))
+       test_set_size = int(len(df) * self.test_size)
+       test_indices = shuffled_indices[:test_set_size]
+       train_indices = shuffled_indices[test_set_size:]
 
-        train_set = df.iloc[train_indices]
-        test_set = df.iloc[test_indices]
+       train_set = df.iloc[train_indices]
+       test_set = df.iloc[test_indices]
 
-        return train_set, test_set
+       return train_set, test_set
+
 
 class XXCrossValidation:
     def __init__(self, k):
