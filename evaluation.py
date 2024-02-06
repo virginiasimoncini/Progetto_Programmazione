@@ -22,17 +22,15 @@ class Holdout:
         return train_set, test_set
 
 class XXCrossValidation:
-    def __init__(self, num_folds, num_executions=1):
+    def __init__(self, num_folds):
         """
         Inizializza l'oggetto XXCrossValidation.
 
         Parameters:
         - num_folds (int): Numero di fold nella cross-validation.
-        - num_executions (int): Numero totale di esecuzioni della cross-validation.
 
         """
         self.num_folds = num_folds
-        self.num_executions = num_executions
 
     def split(self, df):
         """
@@ -59,23 +57,22 @@ class XXCrossValidation:
         # Calcola la lunghezza di ciascun fold
         fold_length = len(df) // self.num_folds
 
-        # Itera sul numero totale di esecuzioni della cross-validation
-        for i in range(self.num_executions):
-            # Itera su ogni fold
-            for j in range(self.num_folds):
-                # Calcola gli indici di inizio e fine del fold
-                test_start, test_end = j * fold_length, (j + 1) * fold_length 
-                
-                # Ottiene il set di test
-                test_set = features_mixed.iloc[test_start:test_end]
-                
-                # Ottiene il set di addestramento concatenando le parti del DataFrame escludendo il fold di test
-                train_set = pd.concat([features_mixed.iloc[:test_start], features_mixed.iloc[test_end:]])
-                
-                # Aggiunge la tupla al risultato
-                folds.append((train_set, test_set))
+        # Itera su ogni fold
+        for j in range(self.num_folds):
+            # Calcola gli indici di inizio e fine del fold
+            test_start, test_end = j * fold_length, (j + 1) * fold_length 
+            
+            # Ottiene il set di test
+            test_set = features_mixed.iloc[test_start:test_end]
+            
+            # Ottiene il set di addestramento concatenando le parti del DataFrame escludendo il fold di test
+            train_set = pd.concat([features_mixed.iloc[:test_start], features_mixed.iloc[test_end:]])
+            
+            # Aggiunge la tupla al risultato
+            folds.append((train_set, test_set))
 
         return folds
+
 
 
 
