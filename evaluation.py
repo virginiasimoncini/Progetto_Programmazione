@@ -21,8 +21,6 @@ class Holdout:
 
         return train_set, test_set
 
-
-
 class XXCrossValidation:
     def __init__(self, k):
         self.k = k
@@ -55,7 +53,11 @@ class ModelEvaluator:
         knn = KNNClassifier(k=self.k)
         knn.fit(X_train, y_train)
 
-        y_pred = knn.predict(X_test.values)
+        # Utilizzo del metodo predict aggiornato che gestisce sia DataFrame che array NumPy
+        if isinstance(X_test, pd.DataFrame):
+            y_pred = knn.predict(X_test)
+        else:
+            y_pred = knn.predict(X_test.values)
 
         accuracy = (y_pred == y_test.values).mean()
         error_rate = 1 - accuracy
