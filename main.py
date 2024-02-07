@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import pandas as pd
 from fetching import data_preprocessing
@@ -6,7 +7,10 @@ from evaluation import Holdout, XXCrossValidation, ModelEvaluator
 import matplotlib.pyplot as plt
 
 # Carica e pre-processa i dati
-X, y = data_preprocessing()
+if len(sys.argv) > 1 :
+    X, y = data_preprocessing(file = sys.argv[1])
+else:
+    X, y = data_preprocessing()
 
 # Definisci le opzioni di validazione incapsulate in oggetti Holdout e XXCrossValidation
 holdout_validation = Holdout(test_size=0.2, random_state=42)
