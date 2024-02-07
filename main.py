@@ -21,7 +21,7 @@ k_neighbors = int(input("Inserisci il numero di vicini (k): "))
 num_folds = int(input("Inserisci il numero di folds per la cross-validation: "))
 
 # Crea l'oggetto XXCrossValidation senza specificare il valore di k
-crossval_validation = XXCrossValidation(k=num_folds)
+crossval_validation = XXCrossValidation(num_folds=num_folds)
 
 
 
