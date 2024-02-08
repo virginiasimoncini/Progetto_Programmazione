@@ -15,13 +15,16 @@ else:
 # Chiedi all'utente di fornire il numero di vicini
 k_neighbors = int(input("Inserisci il numero di vicini (k): "))
 
+# Inizializza le variabili degli oggetti a None
+holdout_validation = None
+crossval_validation = None
 
 # Chiedi all'utente di fornire il tipo di validazione
 validation_type = input("Scegli il tipo di validazione (holdout/crossval): ").lower()
 
-# In base alla scelta faccio l'istanziazione degli oggetti 
+# In base alla scelta faccio l'istanziazione degli oggetti solo se necessario
 if validation_type == 'holdout':
-    holdout_validation = Holdout(test_size=test_size, random_state=random_state)
+    holdout_validation = Holdout()
 elif validation_type == 'crossval':
     num_folds = int(input("Inserisci il numero di folds per la cross-validation: "))
     crossval_validation = XXCrossValidation(num_folds=num_folds)
