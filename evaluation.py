@@ -74,25 +74,11 @@ class XXCrossValidation:
 
         return folds
 
-
-
-
-import os
-import numpy as np
-import pandas as pd
-from itertools import zip_longest
-from fetching import data_preprocessing
-from knn import KNNClassifier
-import matplotlib.pyplot as plt
-
-# ...
-
 class ModelEvaluator:
-    def __init__(self, X, y, validation, k=None):
+    def __init__(self, X, y, validation):
         self.X = X
         self.y = y
         self.validation = validation
-        self.k = k
 
     def evaluate(self, X_train, X_test, y_train, y_test):
         knn = KNNClassifier(k=self.k)
@@ -153,10 +139,7 @@ class ModelEvaluator:
             accuracies, error_rates, specificities, g_means = [], [], [], []
 
             # Aggiunta di una gestione speciale per il caso di cross-validation
-            if self.k is not None:
-                validation_type_list = [f'Fold {i + 1}' for i in range(self.k)]
-            else:
-                validation_type_list = ['Mean']
+            validation_type_list = [f'Fold {i + 1}' for i in range(self.validation.num_folds)] if self.validation.num_folds is not None else ['Mean']
 
             for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
                 accuracy, error_rate, specificity, g_mean = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
@@ -169,7 +152,7 @@ class ModelEvaluator:
 
             mean_accuracy = np.mean(accuracies)
 
-            print(f"\nMean Accuracy across {self.k} folds: {mean_accuracy:.4f}")
+            print(f"\nMean Accuracy across {self.validation.num_folds} folds: {mean_accuracy:.4f}")
 
             # Assicurati che tutte le liste abbiano la stessa lunghezza
             num_items = len(validation_type_list)
@@ -177,6 +160,9 @@ class ModelEvaluator:
             error_rates += [np.mean(error_rates)] * (num_items - len(error_rates))
             specificities += [np.mean(specificities)] * (num_items - len(specificities))
             g_means += [np.mean(g_means)] * (num_items - len(g_means))
+
+            # Verifica che tutte le liste abbiano la stessa lunghezza
+            assert len(accuracies) == len(error_rates) == len(specificities) == len(g_means) == num_items, "Le liste devono avere la stessa lunghezza"
 
             # Salvataggio dei risultati in Excel
             results_df = pd.DataFrame({
