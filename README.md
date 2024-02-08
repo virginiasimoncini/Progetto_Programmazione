@@ -26,11 +26,11 @@ Di seguito una panoramica dettagliata del dataset:
 
 **Classe**: Classificazione del tumore (2 per benigno, 4 per maligno).
 
-## Librerie utilizzate.
+## Librerie utilizzate
 
-Numpy importata come np come libreria ufficiale di Python con le quali si sono trattati tutti i dati e funzioni.
+* **Numpy** importata come np come libreria ufficiale di Python con le quali si sono trattati tutti i dati e funzioni.
 
-Pandas importata come pd usata per la manipolazione e l'analisi dei dati.
+* **Pandas** importata come pd usata per la manipolazione e l'analisi dei dati.
 
 Matplotlib.pyplot importata come plt per fornire all'utenza una visualizzazione grafica.
 
@@ -45,15 +45,20 @@ Per l'installazione delle librerie è necessario digitare da terminale i seguent
 
 
 
-1. **Data	Preprocessing:**
-This branch process the dataset.Its steps are:
-    - **Load the dataset:**
-        We import the dataset from a file called `breast_cancer.csv`
-    - **Divide dataset in features and targets:**
-We pop the "Class" column from the dataframe and assign it to the Y variable. Then we assign the rest of the dataframe to the X variable.
-    - **Process missing values appropiately:**
-We must take into account the missing values in the features dataset. For this we have used the "blackfill" method.
-2. # Model	Development
+  # 1. Data	Preprocessing
+  This branch process the dataset.Its steps are:
+  
+ - **Load the dataset:**
+      We import the dataset from a file called `breast_cancer.csv`
+        
+- **Divide dataset in features and targets:**
+        We pop the "Class" column from the dataframe and assign it to the Y variable. Then we assign the rest of the dataframe to the X variable.
+
+ - **Process missing values appropiately:**
+     We must take into account the missing values in the features dataset. For this we have used the "blackfill" method.
+
+
+ # 2. Model	Development
 Di seguito i vari step che sono stai seguiti per questo branch:
 ## 1. Algoritmo utilizzato: K-Nearest Neighbors 
 L'algoritmo K-nearest neighbor (KNN) è una tecnica di classificazione che opera valutando le caratteristiche di oggetti vicini a quello in esame. Il KNN riceve un set di dati di addestramento con etichette (classi) note. Per un nuovo punto di dati da classificare, calcola la sua distanza rispetto a tutti i punti di addestramento utilizzando una metrica di distanza (la più utilizzata è la distanza euclidea). In seguito identifica i k punti di addestramento più vicini al punto di test in base alla distanza calcolata. Per la classificazione, assegna all'istanza di test l'etichetta di classe più frequente tra i suoi k vicini più prossimi. 
@@ -85,7 +90,6 @@ Di seguito i passaggi:
 
 # 3. Model	Evaluation
 
-
 # Valutazione del Modello implementato
 ## Descrizione
 Questo modulo fornisce funzionalità per la valutazione del modello di classificazione del cancro al seno basato su k-Nearest Neighbors (KNN).
@@ -96,9 +100,11 @@ Con Cross-Validation il dataset si divide in k set che si comparano tra loro in 
 Si importano le logiche implementate negli altri branch rispettivamente il caricamento del dataset fornito e la logica per la gestione e organizzazione del processo.
 
 ## File importati e implementazione del file di valutazione finale e librerie utilizzate.
-fetching.py: Modulo per il preprocessing e il caricamento dei dati.
-knn.py: Implementazione del classificatore KNN (KNNClassifier), funzioni di previsione e funzioni di utilità.
-evaluate_model.py: Script per valutare il modello KNN utilizzando Holdout e K-Fold Cross Validation.
+* fetching.py: Modulo per il preprocessing e il caricamento dei dati.
+
+* knn.py: Implementazione del classificatore KNN (KNNClassifier), funzioni di previsione e funzioni di utilità.
+
+* evaluate_model.py: Script per valutare il modello KNN utilizzando Holdout e K-Fold Cross Validation.
 
 ## Holdout
 In questo caso si fornisce un parametro k ovvero il numero dei vicini e si calcolano le metriche specifiche tramite le previsioni che si ricavano dal dataset.
@@ -107,7 +113,7 @@ A partire da queste calcolo l'efficienza della mia analisi e conservo le metrich
 
 ## Cross-Validation
 Nel caso del Cross-Validation si analizza l'accuratezza di ogni corrispondenza e si fa una media che fornisce per l'appunto l'andamento generale dei test.
-Con questo indices = np.random.permutation(features.index) si va ad effettuare un mix casuale di test che si riproduce in maniera casuale ma più robusta.
-OLa media delle accuretezze viene riportata in un csv.
+Con questo indices = np.random.permutation(features.index) si va ad effettuare un mix casuale di test che si riproduce in maniera casuale, ma più robusta.
+La media delle accuretezze viene riportata in un csv.
 
 
