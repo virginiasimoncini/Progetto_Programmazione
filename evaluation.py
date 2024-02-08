@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 from fetching import data_preprocessing
@@ -108,6 +109,8 @@ class ModelEvaluator:
         return accuracy, error_rate, specificity, g_mean
 
     def evaluate_validation(self):
+        if not os.path.exists("output"):
+            os.makedirs("output")
         if isinstance(self.validation, Holdout):
             train_set, test_set = self.validation.split(pd.concat([self.X, self.y], axis=1))
             accuracy, error_rate, specificity, g_mean = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
@@ -126,13 +129,13 @@ class ModelEvaluator:
                 'Specificity': [specificity],
                 'Geometric Mean': [g_mean]
             })
-            results_df.to_excel('validation_results.xlsx', index=False)
+            results_df.to_excel('output/validation_results.xlsx', index=False)
 
             # Plot delle performance
             plt.bar(['Accuracy', 'Error Rate', 'Specificity', 'Geometric Mean'], [accuracy, error_rate, specificity, g_mean])
             plt.title('Holdout Evaluation Metrics')
             plt.ylabel('Metric Value')
-            plt.savefig('holdout_evaluation_plot.png')
+            plt.savefig('output/holdout_evaluation_plot.png')
             plt.show()
 
         elif isinstance(self.validation, XXCrossValidation):
@@ -158,7 +161,7 @@ class ModelEvaluator:
                 'Specificity': specificities + [np.mean(specificities)],
                 'Geometric Mean': g_means + [np.mean(g_means)]
             })
-            results_df.to_excel('validation_results.xlsx', index=False)
+            results_df.to_excel('output/validation_results.xlsx', index=False)
 
             # Plot delle performance
             for metric in ['Accuracy', 'Error Rate', 'Specificity', 'Geometric Mean']:
@@ -167,5 +170,5 @@ class ModelEvaluator:
             plt.title('Cross-Validation Evaluation Metrics')
             plt.ylabel('Metric Value')
             plt.legend()
-            plt.savefig('crossval_evaluation_plot.png')
+            plt.savefig('output/crossval_evaluation_plot.png')
             plt.show()
