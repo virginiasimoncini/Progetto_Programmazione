@@ -12,26 +12,23 @@ if len(sys.argv) > 1:
 else:
     X, y = data_preprocessing()
 
-# Chiedi all'utente di fornire il numero di vicini
-k_neighbors = int(input("Inserisci il numero di vicini (k): "))
-
-# Inizializza le variabili degli oggetti a None
-holdout_validation = None
-crossval_validation = None
-
 # Chiedi all'utente di fornire il tipo di validazione
 validation_type = input("Scegli il tipo di validazione (holdout/crossval): ").lower()
 
-# In base alla scelta faccio l'istanziazione degli oggetti solo se necessario
+# Inizializza oggetto di validazione in base alla scelta dell'utente
 if validation_type == 'holdout':
-    holdout_validation = Holdout()
+    # Chiedi all'utente di fornire il numero di vicini solo per Holdout
+    k_neighbors = int(input("Inserisci il numero di vicini (k): "))
+    holdout_validation = Holdout(test_size=0.2)
+    evaluator = ModelEvaluator(X, y, validation=holdout_validation, k=k_neighbors)
 elif validation_type == 'crossval':
+    # Chiedi all'utente di fornire il numero di folds solo per Cross Validation
     num_folds = int(input("Inserisci il numero di folds per la cross-validation: "))
     crossval_validation = XXCrossValidation(num_folds=num_folds)
+    evaluator = ModelEvaluator(X, y, validation=crossval_validation, k=None)
 else:
-    raise ValueError("Tipo di validazione non riconosciuto. Inserisci 'holdout' o 'crossval'.")
+    print("Tipo di validazione non riconosciuto. Inserisci 'holdout' o 'crossval'.")
+    sys.exit(1)
 
-# Esegui la validazione solo se uno degli oggetti è stato inizializzato
-if holdout_validation or crossval_validation:
-    evaluator = ModelEvaluator(X, y, validation=holdout_validation or crossval_validation, k=k_neighbors)
-    evaluator.evaluate_validation()
+# Esegui la validazione
+evaluator.evaluate_validation()
