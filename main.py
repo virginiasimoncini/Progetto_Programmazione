@@ -14,6 +14,9 @@ else:
 
 # Chiedi all'utente di fornire il tipo di validazione
 validation_type = input("Scegli il tipo di validazione (holdout/crossval): ").lower()
+while validation_type not in ['holdout', 'crossval']:
+    print("Scelta non valida. Scegli tra 'holdout' e 'crossval'.")
+    validation_type = input("Scegli il tipo di validazione (holdout/crossv")
 
 # Inizializza oggetto di validazione in base alla scelta dell'utente
 if validation_type == 'holdout':
