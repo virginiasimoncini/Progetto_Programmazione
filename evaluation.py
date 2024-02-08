@@ -77,6 +77,16 @@ class XXCrossValidation:
 
 
 
+import os
+import numpy as np
+import pandas as pd
+from itertools import zip_longest
+from fetching import data_preprocessing
+from knn import KNNClassifier
+import matplotlib.pyplot as plt
+
+# ...
+
 class ModelEvaluator:
     def __init__(self, X, y, validation, k=None):
         self.X = X
@@ -111,7 +121,7 @@ class ModelEvaluator:
     def evaluate_validation(self):
         if not os.path.exists("output"):
             os.makedirs("output")
-        
+
         if isinstance(self.validation, Holdout):
             train_set, test_set = self.validation.split(pd.concat([self.X, self.y], axis=1))
             accuracy, error_rate, specificity, g_mean = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
@@ -138,16 +148,16 @@ class ModelEvaluator:
             plt.ylabel('Metric Value')
             plt.savefig('output/holdout_evaluation_plot.png')
             plt.show()
-            
+
         elif isinstance(self.validation, XXCrossValidation):
             accuracies, error_rates, specificities, g_means = [], [], [], []
-            
+
             # Aggiunta di una gestione speciale per il caso di cross-validation
             if self.k is not None:
                 validation_type_list = [f'Fold {i + 1}' for i in range(self.k)]
             else:
                 validation_type_list = ['Mean']
-            
+
             for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
                 accuracy, error_rate, specificity, g_mean = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
                 accuracies.append(accuracy)
@@ -161,16 +171,29 @@ class ModelEvaluator:
 
             print(f"\nMean Accuracy across {self.k} folds: {mean_accuracy:.4f}")
 
+            # Assicurati che tutte le liste abbiano la stessa lunghezza
+            num_items = len(validation_type_list)
+            accuracies += [mean_accuracy] * (num_items - len(accuracies))
+            error_rates += [np.mean(error_rates)] * (num_items - len(error_rates))
+            specificities += [np.mean(specificities)] * (num_items - len(specificities))
+            g_means += [np.mean(g_means)] * (num_items - len(g_means))
+
             # Salvataggio dei risultati in Excel
             results_df = pd.DataFrame({
                 'Validation Type': validation_type_list,
-                'Accuracy': accuracies + [mean_accuracy],
-                'Error Rate': error_rates + [np.mean(error_rates)],
-                'Specificity': specificities + [np.mean(specificities)],
-                'Geometric Mean': g_means + [np.mean(g_means)]
+                'Accuracy': accuracies,
+                'Error Rate': error_rates,
+                'Specificity': specificities,
+                'Geometric Mean': g_means
             })
             results_df.to_excel('output/validation_results.xlsx', index=False)
 
             # Plot delle performance
             for metric in ['Accuracy', 'Error Rate', 'Specificity', 'Geometric Mean']:
-                plt.plot
+                plt.plot(results_df['Validation Type'], results_df[metric], label=metric)
+
+            plt.title('Cross-Validation Evaluation Metrics')
+            plt.ylabel('Metric Value')
+            plt.legend()
+            plt.savefig('output/crossval_evaluation_plot.png')
+            plt.show()
