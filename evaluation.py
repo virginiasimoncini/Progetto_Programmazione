@@ -75,10 +75,11 @@ class XXCrossValidation:
         return folds
 
 class ModelEvaluator:
-    def __init__(self, X, y, validation):
+    def __init__(self, X, y, validation,k):
         self.X = X
         self.y = y
         self.validation = validation
+        self.k=k
 
     def evaluate(self, X_train, X_test, y_train, y_test):
         knn = KNNClassifier(k=self.k)
