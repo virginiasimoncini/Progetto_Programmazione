@@ -100,13 +100,16 @@ class ModelEvaluator:
                 results_df = pd.DataFrame(results)
 
                 # Verifica e allinea le lunghezze delle colonne
-                lengths = [len(results[col]) for col in results_df.columns]
+                lengths = [len(results[col]) for col in results.keys()]
                 max_length = max(lengths)
 
-                for col in results_df.columns:
+                for col in results.keys():
                     current_length = len(results[col])
                     if current_length < max_length:
-                        results_df[col] += [np.nan] * (max_length - current_length)
+                        results[col] += [np.nan] * (max_length - current_length)
+
+                # Crea il DataFrame
+                results_df = pd.DataFrame(results)
 
                 results_df.to_excel('output/validation_results.xlsx', index=False)
 
