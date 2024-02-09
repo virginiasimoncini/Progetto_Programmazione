@@ -130,7 +130,8 @@ class ModelEvaluator:
             validation_type_list = [f'Fold {i + 1}' for i in range(self.validation.num_folds)] if self.validation.num_folds is not None else ['Mean']
 
             for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
-                accuracy, _, _, _ = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
+                accuracy, _, _, _, _ = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
+
                 accuracies.append(accuracy)
 
                 print(f"Fold {i + 1} Accuracy: {accuracy:.4f}")
