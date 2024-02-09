@@ -48,7 +48,7 @@ class ModelEvaluator:
         self.validation = validation
         self.k = k
 
-    def evaluate(self, X_train, X_test, y_train, y_test):
+def evaluate(self, X_train, X_test, y_train, y_test, metrics=None):
         knn = KNNClassifier(k=self.k)
         knn.fit(X_train, y_train)
 
@@ -57,17 +57,24 @@ class ModelEvaluator:
         else:
             y_pred = knn.predict(X_test.values)
 
-        accuracy = (y_pred == y_test.values).mean()
-        error_rate = 1 - accuracy
+        results = {'accuracy': None, 'error_rate': None, 'sensitivity': None, 'specificity': None, 'geometric_mean': None}
 
-        true_negative = np.sum((y_pred == 2) & (y_test == 2))
-        false_positive = np.sum((y_pred == 4) & (y_test == 2))
-        specificity = true_negative / (true_negative + false_positive)
+        if 'accuracy' in metrics:
+            results['accuracy'] = (y_pred == y_test.values).mean()
 
-        recall = np.sum((y_pred == 4) & (y_test == 4)) / np.sum(y_test == 4)
-        g_mean = np.sqrt(specificity * recall)
+        if 'error_rate' in metrics:
+            results['error_rate'] = 1 - results['accuracy']
 
-        return accuracy, error_rate, specificity, g_mean
+        if 'specificity' in metrics:
+            true_negative = np.sum((y_pred == 2) & (y_test == 2))
+            false_positive = np.sum((y_pred == 4) & (y_test == 2))
+            results['specificity'] = true_negative / (true_negative + false_positive)
+
+        if 'geometric_mean' in metrics:
+            recall = np.sum((y_pred == 4) & (y_test == 4)) / np.sum(y_test == 4)
+            results['geometric_mean'] = np.sqrt(results['specificity'] * recall)
+
+        return results
 
     def evaluate_validation(self, metrics=None):
         if not os.path.exists("output"):
