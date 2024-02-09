@@ -96,6 +96,7 @@ class ModelEvaluator:
 
                 results['Validation Type'] = ['Mean']
 
+                # Save results to Excel
                 results_df = pd.DataFrame(results)
 
                 # Verifica e allinea le lunghezze delle colonne
