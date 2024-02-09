@@ -22,33 +22,34 @@ while validation_type not in ['holdout', 'crossval']:
 if validation_type == 'holdout':
     # Chiedi all'utente di fornire il numero di vicini solo per Holdout
     k_neighbors = int(input("Inserisci il numero di vicini (k): "))
-    crossval_validation = Holdout(test_size=0.2)
-    evaluator = ModelEvaluator(X, y, validation=crossval_validation, k=k_neighbors)
+    validation = Holdout(test_size=0.2)
+    evaluator = ModelEvaluator(X, y, validation=validation, k=k_neighbors)
 
-    # Chiedi all'utente di selezionare le metriche
-    print("Scegli le metriche da validare:")
+    # Chiedi all'utente di selezionare la metrica
+    print("Scegli la metrica da validare:")
     print("1. Accuracy Rate")
     print("2. Error Rate")
     print("3. Sensitivity")
     print("4. Specificity")
     print("5. Geometric Mean")
-    print("6. All the above")
 
     metric_choice = input("Inserisci il numero corrispondente all'opzione desiderata: ")
 
-    if metric_choice == '6':
-        metrics_to_validate = ['accuracy', 'error_rate', 'sensitivity', 'specificity', 'geometric_mean']
-    else:
-        metric_mapping = {
-            '1': 'accuracy',
-            '2': 'error_rate',
-            '3': 'sensitivity',
-            '4': 'specificity',
-            '5': 'geometric_mean'
-        }
-        metrics_to_validate = [metric_mapping.get(metric_choice)]
+    metric_mapping = {
+        '1': 'accuracy',
+        '2': 'error_rate',
+        '3': 'specificity',
+        '4': 'geometric_mean',
+    }
+    metrics_to_validate = [metric_mapping.get(metric_choice)]
 
     evaluator.evaluate_validation(metrics=metrics_to_validate)
 else:
-    print("Tipo di validazione non riconosciuto. Inserisci 'holdout' o 'crossval'.")
-    sys.exit(1)
+    num_folds = int(input("Inserisci il numero di folds per la cross-validation: "))
+    validation = XXCrossValidation(num_folds=num_folds)
+    k_neighbors = int(input("Inserisci il numero di vicini (k): "))
+    evaluator = ModelEvaluator(X, y, validation=validation, k=k_neighbors)
+
+    # Chiedi all'utente di selezionare la metrica (per ora solo accuracy in cross-validation)
+    metrics_to_validate = ['accuracy']
+    evaluator.evaluate_validation(metrics=metrics_to_validate)
