@@ -35,7 +35,7 @@ if validation_type == 'holdout':
     metric_choice = input("Inserisci il numero corrispondente all'opzione desiderata: ")
 
     # Seleziona tutte le metriche se l'utente sceglie 5
-    if metric_choice == '5':
+    if metric_choice == '6':
         metrics_to_validate = ['accuracy', 'error_rate', 'specificity', 'geometric_mean']
     else:
         # Mappa la scelta dell'utente a una metrica
@@ -44,6 +44,7 @@ if validation_type == 'holdout':
             '2': 'error_rate',
             '3': 'specificity',
             '4': 'geometric_mean',
+            '5': 'sensibility',
         }
         selected_metric = metric_mapping.get(metric_choice)
         metrics_to_validate = [selected_metric]
