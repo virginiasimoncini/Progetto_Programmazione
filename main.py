@@ -56,7 +56,7 @@ if validation_type == 'holdout':
 else:
     num_folds = int(input("Inserisci il numero di folds per la cross-validation: "))
     validation = XXCrossValidation(num_folds=num_folds)
-    evaluator = ModelEvaluator(X, y, validation=validation)
+    evaluator = ModelEvaluator(X, y, validation=validation,k=None)
 
     # Chiedi all'utente di selezionare la metrica (per ora solo accuracy in cross-validation)
     evaluator.evaluate_validation()
