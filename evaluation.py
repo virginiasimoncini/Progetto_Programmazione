@@ -42,11 +42,12 @@ class XXCrossValidation:
         return folds
 
 class ModelEvaluator:
-    def __init__(self, X, y, validation, k=None):
+    def __init__(self, X, y, validation, k=None, num_folds=None):
         self.X = X
         self.y = y
         self.validation = validation
         self.k = k
+        self.num_folds = num_folds
 
     def evaluate(self, X_train, X_test, y_train, y_test):
         knn = KNNClassifier(k=self.k)
@@ -72,87 +73,56 @@ class ModelEvaluator:
         recall = np.sum((y_pred == 4) & (y_test == 4)) / np.sum(y_test == 4)
         g_mean = np.sqrt(specificity * recall)
 
-        return accuracy, error_rate, specificity, g_mean,sensitivity
+        return accuracy, error_rate, specificity, g_mean, sensitivity
 
-    def evaluate_validation(self, metrics=None):
+    def evaluate_validation(self):
         if not os.path.exists("output"):
             os.makedirs("output")
 
+        results = {'Accuracy': [], 'Error Rate': [], 'Specificity': [], 'Sensitivity': [], 'Geometric Mean': []}
+
         if isinstance(self.validation, Holdout):
             train_set, test_set = self.validation.split(pd.concat([self.X, self.y], axis=1))
-            accuracy, error_rate, specificity, g_mean,sensitivity = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
-
-            if metrics is None:
-                # Stampa tutte le metriche se metrics è None
-                print("Holdout Evaluation:")
-                print(f"Accuracy: {accuracy:.4f}")
-                print(f"Error Rate: {error_rate:.4f}")
-                print(f"Specificity: {specificity:.4f}")
-                print(f"Geometric Mean: {g_mean:.4f}")
-                print(f"Sensitivity: {sensitivity:.4f}")
-            else:
-                # Stampa solo le metriche specificate
-                for metric in metrics:
-                    if metric == 'accuracy':
-                        print(f"Holdout Evaluation - {metric.capitalize()}: {accuracy:.4f}")
-                    elif metric == 'error_rate':
-                        print(f"Holdout Evaluation - {metric.capitalize()}: {error_rate:.4f}")
-                    elif metric == 'specificity':
-                        print(f"Holdout Evaluation - {metric.capitalize()}: {specificity:.4f}")
-                    elif metric == 'geometric_mean':
-                        print(f"Holdout Evaluation - {metric.capitalize()}: {g_mean:.4f}")
-                    elif metric == 'sensitivity':
-                        print(f"Holdout Evaluation - {metric.capitalize()}: {sensitivity:.4f}")
-                    else:
-                        print(f"Metrica non valida: {metric}")
-
-            # Salvataggio dei risultati in Excel
-            results_df = pd.DataFrame({
-                'Validation Type': ['Holdout'],
-                'Accuracy': [accuracy],
-                'Error Rate': [error_rate],
-                'Specificity': [specificity],
-                'Geometric Mean': [g_mean],
-                'Sensitivity': [sensitivity],
-            })
-            results_df.to_excel('output/validation_results.xlsx', index=False)
-
-            # Plot delle performance
-            plt.bar(['Accuracy', 'Error Rate', 'Specificity', 'Geometric Mean','Sensitivity'], [accuracy, error_rate, specificity, g_mean,sensitivity])
-            plt.title('Holdout Evaluation Metrics')
-            plt.ylabel('Metric Value')
-            plt.savefig('output/holdout_evaluation_plot.png')
-            plt.show()
+            results['Validation Type'] = [self.validation.__class__.__name__]
 
         elif isinstance(self.validation, XXCrossValidation):
-            accuracies = []
+            results['Validation Type'] = [f'Fold {i + 1}' for i in range(self.validation.num_folds)] if self.validation.num_folds is not None else ['Mean']
 
-            validation_type_list = [f'Fold {i + 1}' for i in range(self.validation.num_folds)] if self.validation.num_folds is not None else ['Mean']
+        for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
+            accuracy, error_rate, specificity, g_mean, sensitivity = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
 
-            for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
-                accuracy, _, _, _, _ = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
+            results['Accuracy'].append(accuracy)
+            results['Error Rate'].append(error_rate)
+            results['Specificity'].append(specificity)
+            results['Sensitivity'].append(sensitivity)
+            results['Geometric Mean'].append(g_mean)
 
-                accuracies.append(accuracy)
-
+            if isinstance(self.validation, XXCrossValidation):
                 print(f"Fold {i + 1} Accuracy: {accuracy:.4f}")
 
-            mean_accuracy = np.mean(accuracies)
+        if isinstance(self.validation, XXCrossValidation):
+            mean_accuracy = np.mean(results['Accuracy'])
+            mean_error_rate = np.mean(results['Error Rate'])
+            mean_specificity = np.mean(results['Specificity'])
+            mean_sensitivity = np.mean(results['Sensitivity'])
+            mean_g_mean = np.mean(results['Geometric Mean'])
 
-            print(f"\nMean Accuracy across {self.validation.num_folds} folds: {mean_accuracy:.4f}")
+            print(f"\nMean Evaluation across {self.validation.num_folds} folds:")
+            print(f"Mean Accuracy: {mean_accuracy:.4f}")
+            print(f"Mean Error Rate: {mean_error_rate:.4f}")
+            print(f"Mean Specificity: {mean_specificity:.4f}")
+            print(f"Mean Sensitivity: {mean_sensitivity:.4f}")
+            print(f"Mean Geometric Mean: {mean_g_mean:.4f}")
 
-            num_items = len(validation_type_list)
-            accuracies += [mean_accuracy] * (num_items - len(accuracies))
+            results['Validation Type'] = ['Mean']
 
-            assert len(accuracies) == num_items, "Le liste devono avere la stessa lunghezza"
+        results_df = pd.DataFrame(results)
+        results_df.to_excel('output/validation_results.xlsx', index=False)
 
-            results_df = pd.DataFrame({
-                'Validation Type': validation_type_list,
-                'Accuracy': accuracies
-            })
-            results_df.to_excel('output/validation_results.xlsx', index=False)
-
-            plt.bar(['Accuracy'], [mean_accuracy])
-            plt.title('Cross-Validation Evaluation Metrics')
-            plt.ylabel('Mean Accuracy')
-            plt.savefig('output/crossval_evaluation_plot.png')
-            plt.show()
+        # Plot delle performance
+        metrics = ['Accuracy', 'Error Rate', 'Specificity', 'Sensitivity', 'Geometric Mean']
+        plt.bar(metrics, results_df.iloc[0, 1:])
+        plt.title(f'{results_df["Validation Type"].values[0]} Evaluation Metrics')
+        plt.ylabel('Metric Value')
+        plt.savefig(f'output/{results_df["Validation Type"].values[0].lower()}_evaluation_plot.png')
+        plt.show()
