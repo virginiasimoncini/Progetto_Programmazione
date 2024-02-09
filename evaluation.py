@@ -65,6 +65,11 @@ class ModelEvaluator:
         true_negative = np.sum((y_pred == 2) & (y_test == 2))
         false_positive = np.sum((y_pred == 4) & (y_test == 2))
         specificity = true_negative / (true_negative + false_positive)
+        if (true_negative + false_positive) != 0:
+           specificity = true_negative / (true_negative + false_positive)
+        else:
+            specificity = 0  # o un altro valore appropriato
+
 
         true_positive = np.sum((y_pred == 4) & (y_test == 4))
         sensitivity = true_positive / np.sum(y_test == 4)
