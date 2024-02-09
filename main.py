@@ -36,7 +36,7 @@ if validation_type == 'holdout':
 
     # Seleziona tutte le metriche se l'utente sceglie 5
     if metric_choice == '6':
-        metrics_to_validate = ['accuracy', 'error_rate', 'specificity', 'geometric_mean']
+        metrics_to_validate = ['accuracy', 'error_rate', 'specificity', 'geometric_mean','sensitivity']
     else:
         # Mappa la scelta dell'utente a una metrica
         metric_mapping = {
