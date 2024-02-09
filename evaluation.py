@@ -81,48 +81,66 @@ class ModelEvaluator:
 
         results = {'Accuracy': [], 'Error Rate': [], 'Specificity': [], 'Sensitivity': [], 'Geometric Mean': []}
 
-        if isinstance(self.validation, Holdout):
-            train_set, test_set = self.validation.split(pd.concat([self.X, self.y], axis=1))
-            results['Validation Type'] = [self.validation.__class__.__name__]
+        if isinstance(self.validation, (Holdout, XXCrossValidation)):
+            validation_type = self.validation.__class__.__name__
+            results['Validation Type'] = [validation_type]
 
-        elif isinstance(self.validation, XXCrossValidation):
-            results['Validation Type'] = [f'Fold {i + 1}' for i in range(self.validation.num_folds)] if self.validation.num_folds is not None else ['Mean']
+            if isinstance(self.validation, Holdout):
+                train_set, test_set = self.validation.split(pd.concat([self.X, self.y], axis=1))
+                self.evaluate_and_store_results(train_set, test_set, results, validation_type)
+            elif isinstance(self.validation, XXCrossValidation):
+                for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
+                    self.evaluate_and_store_results(train_set, test_set, results, validation_type, i)
 
-        for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
-            accuracy, error_rate, specificity, g_mean, sensitivity = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
+                self.calculate_and_print_mean(results, validation_type)
 
-            results['Accuracy'].append(accuracy)
-            results['Error Rate'].append(error_rate)
-            results['Specificity'].append(specificity)
-            results['Sensitivity'].append(sensitivity)
-            results['Geometric Mean'].append(g_mean)
+                results['Validation Type'] = ['Mean']
 
-            if isinstance(self.validation, XXCrossValidation):
-                print(f"Fold {i + 1} Accuracy: {accuracy:.4f}")
+                results_df = pd.DataFrame(results)
 
-        if isinstance(self.validation, XXCrossValidation):
-            mean_accuracy = np.mean(results['Accuracy'])
-            mean_error_rate = np.mean(results['Error Rate'])
-            mean_specificity = np.mean(results['Specificity'])
-            mean_sensitivity = np.mean(results['Sensitivity'])
-            mean_g_mean = np.mean(results['Geometric Mean'])
+                # Verifica e allinea le lunghezze delle colonne
+                lengths = [len(results[col]) for col in results_df.columns]
+                max_length = max(lengths)
 
-            print(f"\nMean Evaluation across {self.validation.num_folds} folds:")
-            print(f"Mean Accuracy: {mean_accuracy:.4f}")
-            print(f"Mean Error Rate: {mean_error_rate:.4f}")
-            print(f"Mean Specificity: {mean_specificity:.4f}")
-            print(f"Mean Sensitivity: {mean_sensitivity:.4f}")
-            print(f"Mean Geometric Mean: {mean_g_mean:.4f}")
+                for col in results_df.columns:
+                    current_length = len(results[col])
+                    if current_length < max_length:
+                        results_df[col] += [np.nan] * (max_length - current_length)
 
-            results['Validation Type'] = ['Mean']
+                results_df.to_excel('output/validation_results.xlsx', index=False)
 
-        results_df = pd.DataFrame(results)
-        results_df.to_excel('output/validation_results.xlsx', index=False)
+                # Plot delle performance
+                metrics = ['Accuracy', 'Error Rate', 'Specificity', 'Sensitivity', 'Geometric Mean']
+                plt.bar(metrics, results_df.iloc[0, 1:])
+                plt.title(f'{validation_type} Evaluation Metrics')
+                plt.ylabel('Metric Value')
+                plt.savefig(f'output/{validation_type.lower()}_evaluation_plot.png')
+                plt.show()
 
-        # Plot delle performance
-        metrics = ['Accuracy', 'Error Rate', 'Specificity', 'Sensitivity', 'Geometric Mean']
-        plt.bar(metrics, results_df.iloc[0, 1:])
-        plt.title(f'{results_df["Validation Type"].values[0]} Evaluation Metrics')
-        plt.ylabel('Metric Value')
-        plt.savefig(f'output/{results_df["Validation Type"].values[0].lower()}_evaluation_plot.png')
-        plt.show()
+    def evaluate_and_store_results(self, train_set, test_set, results, validation_type, fold_number=None):
+        accuracy, error_rate, specificity, g_mean, sensitivity = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
+
+        results['Accuracy'].append(accuracy)
+        results['Error Rate'].append(error_rate)
+        results['Specificity'].append(specificity)
+        results['Sensitivity'].append(sensitivity)
+        results['Geometric Mean'].append(g_mean)
+
+        if fold_number is not None:
+            print(f"{validation_type} {fold_number + 1} Accuracy: {accuracy:.4f}")
+        else:
+            print(f"{validation_type} Accuracy: {accuracy:.4f}")
+
+    def calculate_and_print_mean(self, results, validation_type):
+        mean_accuracy = np.mean(results['Accuracy'])
+        mean_error_rate = np.mean(results['Error Rate'])
+        mean_specificity = np.mean(results['Specificity'])
+        mean_sensitivity = np.mean(results['Sensitivity'])
+        mean_g_mean = np.mean(results['Geometric Mean'])
+
+        print(f"\nMean Evaluation across {validation_type}:")
+        print(f"Mean Accuracy: {mean_accuracy:.4f}")
+        print(f"Mean Error Rate: {mean_error_rate:.4f}")
+        print(f"Mean Specificity: {mean_specificity:.4f}")
+        print(f"Mean Sensitivity: {mean_sensitivity:.4f}")
+        print(f"Mean Geometric Mean: {mean_g_mean:.4f}")
