@@ -97,29 +97,10 @@ class ModelEvaluator:
                 results['Validation Type'] = ['Mean']
 
                 # Save results to Excel
-                results_df = pd.DataFrame(results)
-
-                # Verifica e allinea le lunghezze delle colonne
-                lengths = [len(results[col]) for col in results.keys()]
-                max_length = max(lengths)
-
-                for col in results.keys():
-                    current_length = len(results[col])
-                    if current_length < max_length:
-                        results[col] += [np.nan] * (max_length - current_length)
-
-                # Crea il DataFrame
-                results_df = pd.DataFrame(results)
-
-                results_df.to_excel('output/validation_results.xlsx', index=False)
+                self.save_to_excel(results)
 
                 # Plot delle performance
-                metrics = ['Accuracy', 'Error Rate', 'Specificity', 'Sensitivity', 'Geometric Mean']
-                plt.bar(metrics, results_df.iloc[0, 1:])
-                plt.title(f'{validation_type} Evaluation Metrics')
-                plt.ylabel('Metric Value')
-                plt.savefig(f'output/{validation_type.lower()}_evaluation_plot.png')
-                plt.show()
+                self.plot_results(results, validation_type)
 
     def evaluate_and_store_results(self, train_set, test_set, results, validation_type, fold_number=None):
         accuracy, error_rate, specificity, g_mean, sensitivity = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
@@ -148,3 +129,27 @@ class ModelEvaluator:
         print(f"Mean Specificity: {mean_specificity:.4f}")
         print(f"Mean Sensitivity: {mean_sensitivity:.4f}")
         print(f"Mean Geometric Mean: {mean_g_mean:.4f}")
+
+    def save_to_excel(self, results):
+        # Verifica e allinea le lunghezze delle colonne
+        lengths = [len(results[col]) for col in results.keys()]
+        max_length = max(lengths)
+
+        for col in results.keys():
+            current_length = len(results[col])
+            if current_length < max_length:
+                results[col] += [np.nan] * (max_length - current_length)
+
+        # Crea il DataFrame
+        results_df = pd.DataFrame(results)
+
+        results_df.to_excel('output/validation_results.xlsx', index=False)
+
+    def plot_results(self, results, validation_type):
+        # Plot delle performance
+        metrics = ['Accuracy', 'Error Rate', 'Specificity', 'Sensitivity', 'Geometric Mean']
+        plt.bar(metrics, results['Accuracy'])  # Modifica qui per la metrica che vuoi visualizzare
+        plt.title(f'{validation_type} Evaluation Metrics')
+        plt.ylabel('Metric Value')
+        plt.savefig(f'output/{validation_type.lower()}_evaluation_plot.png')
+        plt.show()
