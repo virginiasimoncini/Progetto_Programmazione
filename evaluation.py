@@ -118,7 +118,7 @@ class ModelEvaluator:
             results_df.to_excel('output/validation_results.xlsx', index=False)
 
             # Plot delle performance
-            plt.bar(['Accuracy', 'Error Rate', 'Specificity', 'Geometric Mean'], [accuracy, error_rate, specificity, g_mean,sensitivity])
+            plt.bar(['Accuracy', 'Error Rate', 'Specificity', 'Geometric Mean','Sensitivity'], [accuracy, error_rate, specificity, g_mean,sensitivity])
             plt.title('Holdout Evaluation Metrics')
             plt.ylabel('Metric Value')
             plt.savefig('output/holdout_evaluation_plot.png')
