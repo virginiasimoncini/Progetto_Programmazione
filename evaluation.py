@@ -24,68 +24,34 @@ class Holdout:
 
 class XXCrossValidation:
     def __init__(self, num_folds):
-        """
-        Inizializza l'oggetto XXCrossValidation.
-
-        Parameters:
-        - num_folds (int): Numero di fold nella cross-validation.
-
-        """
         self.num_folds = num_folds
 
     def split(self, df):
-        """
-        Suddivide il DataFrame in fold per la cross-validation.
-
-        Parameters:
-        - df (pd.DataFrame): Il DataFrame contenente i dati.
-
-        Returns:
-        - folds (list): Una lista di tuple, ognuna contenente un set di addestramento e un set di test.
-
-        """
         folds = []
-
-        # Imposta il seed per la riproducibilità
         np.random.seed(42)
-
-        # Ottiene gli indici del DataFrame in modo casuale
         indices = np.random.permutation(df.index)
-
-        # Mescola le righe del DataFrame
         features_mixed = df.loc[indices]
-
-        # Calcola la lunghezza di ciascun fold
         fold_length = len(df) // self.num_folds
 
-        # Itera su ogni fold
         for j in range(self.num_folds):
-            # Calcola gli indici di inizio e fine del fold
             test_start, test_end = j * fold_length, (j + 1) * fold_length 
-            
-            # Ottiene il set di test
             test_set = features_mixed.iloc[test_start:test_end]
-            
-            # Ottiene il set di addestramento concatenando le parti del DataFrame escludendo il fold di test
             train_set = pd.concat([features_mixed.iloc[:test_start], features_mixed.iloc[test_end:]])
-            
-            # Aggiunge la tupla al risultato
             folds.append((train_set, test_set))
 
         return folds
 
 class ModelEvaluator:
-    def __init__(self, X, y, validation,k):
+    def __init__(self, X, y, validation, k):
         self.X = X
         self.y = y
         self.validation = validation
-        self.k=k
+        self.k = k
 
     def evaluate(self, X_train, X_test, y_train, y_test):
         knn = KNNClassifier(k=self.k)
         knn.fit(X_train, y_train)
 
-        # Utilizzo del metodo predict aggiornato che gestisce sia DataFrame che array NumPy
         if isinstance(X_test, pd.DataFrame):
             y_pred = knn.predict(X_test)
         else:
@@ -94,18 +60,16 @@ class ModelEvaluator:
         accuracy = (y_pred == y_test.values).mean()
         error_rate = 1 - accuracy
 
-        # Calcolo della specificità
         true_negative = np.sum((y_pred == 2) & (y_test == 2))
         false_positive = np.sum((y_pred == 4) & (y_test == 2))
         specificity = true_negative / (true_negative + false_positive)
 
-        # Calcolo della geometric mean
         recall = np.sum((y_pred == 4) & (y_test == 4)) / np.sum(y_test == 4)
         g_mean = np.sqrt(specificity * recall)
 
         return accuracy, error_rate, specificity, g_mean
 
-    def evaluate_validation(self):
+    def evaluate_validation(self, metrics=None):
         if not os.path.exists("output"):
             os.makedirs("output")
 
@@ -139,7 +103,6 @@ class ModelEvaluator:
         elif isinstance(self.validation, XXCrossValidation):
             accuracies, error_rates, specificities, g_means = [], [], [], []
 
-            # Aggiunta di una gestione speciale per il caso di cross-validation
             validation_type_list = [f'Fold {i + 1}' for i in range(self.validation.num_folds)] if self.validation.num_folds is not None else ['Mean']
 
             for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
@@ -155,17 +118,14 @@ class ModelEvaluator:
 
             print(f"\nMean Accuracy across {self.validation.num_folds} folds: {mean_accuracy:.4f}")
 
-            # Assicurati che tutte le liste abbiano la stessa lunghezza
             num_items = len(validation_type_list)
             accuracies += [mean_accuracy] * (num_items - len(accuracies))
             error_rates += [np.mean(error_rates)] * (num_items - len(error_rates))
             specificities += [np.mean(specificities)] * (num_items - len(specificities))
             g_means += [np.mean(g_means)] * (num_items - len(g_means))
 
-            # Verifica che tutte le liste abbiano la stessa lunghezza
             assert len(accuracies) == len(error_rates) == len(specificities) == len(g_means) == num_items, "Le liste devono avere la stessa lunghezza"
 
-            # Salvataggio dei risultati in Excel
             results_df = pd.DataFrame({
                 'Validation Type': validation_type_list,
                 'Accuracy': accuracies,
@@ -175,7 +135,6 @@ class ModelEvaluator:
             })
             results_df.to_excel('output/validation_results.xlsx', index=False)
 
-            # Plot delle performance
             for metric in ['Accuracy', 'Error Rate', 'Specificity', 'Geometric Mean']:
                 plt.plot(results_df['Validation Type'], results_df[metric], label=metric)
 
