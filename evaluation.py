@@ -71,9 +71,7 @@ class ModelEvaluator:
 
         return accuracy, error_rate, specificity, g_mean
 
-
-
-    def evaluate_validation(self, metric=None):
+    def evaluate_validation(self, metrics=None):
         if not os.path.exists("output"):
             os.makedirs("output")
 
@@ -81,16 +79,26 @@ class ModelEvaluator:
             train_set, test_set = self.validation.split(pd.concat([self.X, self.y], axis=1))
             accuracy, error_rate, specificity, g_mean = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
 
-            if metric == 'accuracy':
-                print(f"Holdout Evaluation - {metric.capitalize()}: {accuracy:.4f}")
-            elif metric == 'error_rate':
-                print(f"Holdout Evaluation - {metric.capitalize()}: {error_rate:.4f}")
-            elif metric == 'specificity':
-                print(f"Holdout Evaluation - {metric.capitalize()}: {specificity:.4f}")
-            elif metric == 'geometric_mean':
-                print(f"Holdout Evaluation - {metric.capitalize()}: {g_mean:.4f}")
+            if metrics is None:
+                # Stampa tutte le metriche se metrics è None
+                print("Holdout Evaluation:")
+                print(f"Accuracy: {accuracy:.4f}")
+                print(f"Error Rate: {error_rate:.4f}")
+                print(f"Specificity: {specificity:.4f}")
+                print(f"Geometric Mean: {g_mean:.4f}")
             else:
-                print("Metrica non valida.")
+                # Stampa solo le metriche specificate
+                for metric in metrics:
+                    if metric == 'accuracy':
+                        print(f"Holdout Evaluation - {metric.capitalize()}: {accuracy:.4f}")
+                    elif metric == 'error_rate':
+                        print(f"Holdout Evaluation - {metric.capitalize()}: {error_rate:.4f}")
+                    elif metric == 'specificity':
+                        print(f"Holdout Evaluation - {metric.capitalize()}: {specificity:.4f}")
+                    elif metric == 'geometric_mean':
+                        print(f"Holdout Evaluation - {metric.capitalize()}: {g_mean:.4f}")
+                    else:
+                        print(f"Metrica non valida: {metric}")
 
             # Salvataggio dei risultati in Excel
             results_df = pd.DataFrame({
@@ -108,7 +116,6 @@ class ModelEvaluator:
             plt.ylabel('Metric Value')
             plt.savefig('output/holdout_evaluation_plot.png')
             plt.show()
-
 
         elif isinstance(self.validation, XXCrossValidation):
             accuracies = []
