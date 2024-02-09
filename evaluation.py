@@ -42,7 +42,7 @@ class XXCrossValidation:
         return folds
 
 class ModelEvaluator:
-    def __init__(self, X, y, validation, k):
+    def __init__(self, X, y, validation, k=None):
         self.X = X
         self.y = y
         self.validation = validation
