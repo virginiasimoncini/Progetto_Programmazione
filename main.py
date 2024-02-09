@@ -22,12 +22,8 @@ while validation_type not in ['holdout', 'crossval']:
 if validation_type == 'holdout':
     # Chiedi all'utente di fornire il numero di vicini solo per Holdout
     k_neighbors = int(input("Inserisci il numero di vicini (k): "))
-    holdout_validation(X, y, k_neighbors)
-elif validation_type == 'crossval':
-    # Chiedi all'utente di fornire il numero di folds solo per Cross Validation
-    num_folds = int(input("Inserisci il numero di folds per la cross-validation: "))
-    crossval_validation = XXCrossValidation(num_folds=num_folds)
-    evaluator = ModelEvaluator(X, y, validation=crossval_validation, k=None)
+    crossval_validation = Holdout(test_size=0.2)
+    evaluator = ModelEvaluator(X, y, validation=crossval_validation, k=k_neighbors)
 
     # Chiedi all'utente di selezionare le metriche
     print("Scegli le metriche da validare:")
