@@ -5,6 +5,14 @@ from fetching import data_preprocessing
 from knn import KNNClassifier
 import matplotlib.pyplot as plt
 
+metric_mapping = [
+    'Accuracy',
+    'Error Rate',
+    'Specificity',
+    'Geometric Mean',
+    'Sensibility',
+]
+
 class Holdout:
     def __init__(self, test_size, random_state=None):
         self.test_size = test_size
@@ -48,11 +56,20 @@ class ModelEvaluator:
         self.validation = validation
         self.k = k
         self.num_folds = num_folds
-
+        print("Scegli la metrica da validare:")
+        print("1. Accuracy Rate")
+        print("2. Error Rate")
+        print("3. Specificity")
+        print("4. Geometric Mean")
+        print("5. Sensitivity")
+        print("6. Tutte le Metriche")
+        self.choice = int(input("Inserisci il numero corrispondente all'opzione desiderata: "))
+    
+    #keep it
     def evaluate(self, X_train, X_test, y_train, y_test):
         knn = KNNClassifier(k=self.k)
         knn.fit(X_train, y_train)
-
+        #create a switch for the choice 
         if isinstance(X_test, pd.DataFrame):
             y_pred = knn.predict(X_test)
         else:
@@ -79,61 +96,42 @@ class ModelEvaluator:
         g_mean = np.sqrt(specificity * recall)
 
         return accuracy, error_rate, specificity, g_mean, sensitivity
-
-    def evaluate_validation(self):
+    #dont
+    def evaluate_validation(self,metrics):
         if not os.path.exists("output"):
             os.makedirs("output")
+        if isinstance(self.validation, Holdout):
+            train_set, test_set = self.validation.split(pd.concat([self.X, self.y], axis=1))
+            result = self.evaluate_and_store_results(train_set, test_set,metrics)
+        else:
+            for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
+                result = self.evaluate_and_store_results(train_set, test_set, metrics, i)
 
-        results = {'Accuracy': [], 'Error Rate': [], 'Specificity': [], 'Sensitivity': [], 'Geometric Mean': []}
+        self.calculate_and_print_mean(result,metrics)
 
-        if isinstance(self.validation, (Holdout, XXCrossValidation)):
-            validation_type = self.validation.__class__.__name__
-            results['Validation Type'] = [validation_type]
+        #result['Validation Type'] = ['Mean']
 
-            if isinstance(self.validation, Holdout):
-                train_set, test_set = self.validation.split(pd.concat([self.X, self.y], axis=1))
-                self.evaluate_and_store_results(train_set, test_set, results, validation_type)
-            elif isinstance(self.validation, XXCrossValidation):
-                for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
-                    self.evaluate_and_store_results(train_set, test_set, results, validation_type, i)
+        # Save results to Excel
+        self.save_to_excel(result)
 
-                self.calculate_and_print_mean(results, validation_type)
-
-                results['Validation Type'] = ['Mean']
-
-                # Save results to Excel
-                self.save_to_excel(results)
-
-                # Plot delle performance
-                self.plot_results(results, validation_type)
-
-    def evaluate_and_store_results(self, train_set, test_set, results, validation_type, fold_number=None):
+        # Plot delle performance
+        self.plot_results(result)
+    #dont
+    def evaluate_and_store_results(self, train_set, test_set, metrics, fold_number=None):
         accuracy, error_rate, specificity, g_mean, sensitivity = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
-
-        results['Accuracy'].append(accuracy)
-        results['Error Rate'].append(error_rate)
-        results['Specificity'].append(specificity)
-        results['Sensitivity'].append(sensitivity)
-        results['Geometric Mean'].append(g_mean)
+        results=[accuracy,error_rate,specificity,g_mean,sensitivity]
 
         if fold_number is not None:
-            print(f"{validation_type} {fold_number + 1} Accuracy: {accuracy:.4f}")
+            print(f"{self.validation.__class__.__name__} {fold_number + 1} {metric_mapping[metrics]}: {accuracy:.4f}")
         else:
-            print(f"{validation_type} Accuracy: {accuracy:.4f}")
+            print(f"{self.validation.__class__.__name__} {metric_mapping[metrics]}: {accuracy:.4f}")
+        return results[metrics]
 
-    def calculate_and_print_mean(self, results, validation_type):
-        mean_accuracy = np.mean(results['Accuracy'])
-        mean_error_rate = np.mean(results['Error Rate'])
-        mean_specificity = np.mean(results['Specificity'])
-        mean_sensitivity = np.mean(results['Sensitivity'])
-        mean_g_mean = np.mean(results['Geometric Mean'])
+    def calculate_and_print_mean(self, results,metrics):
+        mean_accuracy = np.mean(results)
 
-        print(f"\nMean Evaluation across {validation_type}:")
-        print(f"Mean Accuracy: {mean_accuracy:.4f}")
-        print(f"Mean Error Rate: {mean_error_rate:.4f}")
-        print(f"Mean Specificity: {mean_specificity:.4f}")
-        print(f"Mean Sensitivity: {mean_sensitivity:.4f}")
-        print(f"Mean Geometric Mean: {mean_g_mean:.4f}")
+        print(f"\nMean Evaluation across {self.validation.__class__.__name__}:")
+        print(f"Mean {metric_mapping[metrics]}: {mean_accuracy:.4f}")
 
     def save_to_excel(self, results):
         # Verifica e allinea le lunghezze delle colonne
@@ -150,11 +148,11 @@ class ModelEvaluator:
 
         results_df.to_excel('output/validation_results.xlsx', index=False)
 
-    def plot_results(self, results, validation_type):
+    def plot_results(self, results):
         # Plot delle performance
         metrics = ['Accuracy', 'Error Rate', 'Specificity', 'Sensitivity', 'Geometric Mean']
         plt.bar(metrics, results['Accuracy'])  # Modifica qui per la metrica che vuoi visualizzare
-        plt.title(f'{validation_type} Evaluation Metrics')
+        plt.title(f'{self.validation.__class__.__name__} Evaluation Metrics')
         plt.ylabel('Metric Value')
-        plt.savefig(f'output/{validation_type.lower()}_evaluation_plot.png')
+        plt.savefig(f'output/{self.validation.__class__.__name__.lower()}_evaluation_plot.png')
         plt.show()

@@ -25,38 +25,20 @@ if validation_type == 'holdout':
     validation = Holdout(test_size=0.2)
     evaluator = ModelEvaluator(X, y, validation=validation, k=k_neighbors)
 
-    print("Scegli la metrica da validare:")
-    print("1. Accuracy Rate")
-    print("2. Error Rate")
-    print("3. Specificity")
-    print("4. Geometric Mean")
-    print("5. Sensitivity")
-    print("6. Tutte le Metriche")
-
-    metric_choice = input("Inserisci il numero corrispondente all'opzione desiderata: ")
-
-    # Seleziona tutte le metriche se l'utente sceglie 5
-    if metric_choice == '6':
-        metrics_to_validate = ['accuracy', 'error_rate', 'specificity', 'geometric_mean','sensitivity']
-    else:
-        # Mappa la scelta dell'utente a una metrica
-        metric_mapping = {
-            '1': 'accuracy',
-            '2': 'error_rate',
-            '3': 'specificity',
-            '4': 'geometric_mean',
-            '5': 'sensibility',
-        }
-        selected_metric = metric_mapping.get(metric_choice)
-        metrics_to_validate = [selected_metric]
-
-    # Valida le metriche selezionate
-    evaluator.evaluate_validation(metrics=metrics_to_validate)
-
 else:
     num_folds = int(input("Inserisci il numero di folds per la cross-validation: "))
     validation = XXCrossValidation(num_folds=num_folds)
     evaluator = ModelEvaluator(X, y, validation=validation)
-
     # Chiedi all'utente di selezionare la metrica (per ora solo accuracy in cross-validation)
-    evaluator.evaluate_validation()
+
+# Seleziona tutte le metriche se l'utente sceglie 5
+if metric_choice == '6':
+    metrics_to_validate = ['accuracy', 'error_rate', 'specificity', 'geometric_mean','sensitivity']
+    # Mappa la scelta dell'utente a una metrica
+    #selected_metric = metric_mapping.get(metric_choice)
+    #metrics_to_validate = [selected_metric]
+
+# Valida le metriche selezionate
+for x in range(5):
+    print(x,"...")
+    evaluator.evaluate_validation(metrics=x)
