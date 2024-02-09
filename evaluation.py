@@ -48,7 +48,7 @@ class ModelEvaluator:
         self.validation = validation
         self.k = k
 
-    def evaluate(self, X_train, X_test, y_train, y_test, metrics=None):
+    def evaluate(self, X_train, X_test, y_train, y_test):
         knn = KNNClassifier(k=self.k)
         knn.fit(X_train, y_train)
 
@@ -57,24 +57,19 @@ class ModelEvaluator:
         else:
             y_pred = knn.predict(X_test.values)
 
-        results = {'accuracy': None, 'error_rate': None, 'sensitivity': None, 'specificity': None, 'geometric_mean': None}
+        accuracy = (y_pred == y_test.values).mean()
+        error_rate = 1 - accuracy
 
-        if metrics and 'accuracy' in metrics:
-            results['accuracy'] = (y_pred == y_test.values).mean()
+        # Calcolo della specificità
+        true_negative = np.sum((y_pred == 2) & (y_test == 2))
+        false_positive = np.sum((y_pred == 4) & (y_test == 2))
+        specificity = true_negative / (true_negative + false_positive)
 
-        if metrics and 'error_rate' in metrics:
-            results['error_rate'] = 1 - results['accuracy']
+        # Calcolo della geometric mean
+        recall = np.sum((y_pred == 4) & (y_test == 4)) / np.sum(y_test == 4)
+        g_mean = np.sqrt(specificity * recall)
 
-        if metrics and 'specificity' in metrics:
-            true_negative = np.sum((y_pred == 2) & (y_test == 2))
-            false_positive = np.sum((y_pred == 4) & (y_test == 2))
-            results['specificity'] = true_negative / (true_negative + false_positive)
-
-        if metrics and 'geometric_mean' in metrics:
-            recall = np.sum((y_pred == 4) & (y_test == 4)) / np.sum(y_test == 4)
-            results['geometric_mean'] = np.sqrt(results['specificity'] * recall)
-
-        return results
+        return accuracy, error_rate, specificity, g_mean
 
     def evaluate_validation(self):
         if not os.path.exists("output"):
@@ -82,13 +77,13 @@ class ModelEvaluator:
 
         if isinstance(self.validation, Holdout):
             train_set, test_set = self.validation.split(pd.concat([self.X, self.y], axis=1))
-            accuracy, error_rate, specificity, geometric_mean = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
+            accuracy, error_rate, specificity, g_mean = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
 
             print("Holdout Evaluation:")
             print(f"Accuracy: {accuracy:.4f}")
             print(f"Error Rate: {error_rate:.4f}")
             print(f"Specificity: {specificity:.4f}")
-            print(f"Geometric Mean: {geometric_mean:.4f}")
+            print(f"Geometric Mean: {g_mean:.4f}")
 
             # Salvataggio dei risultati in Excel
             results_df = pd.DataFrame({
@@ -96,12 +91,12 @@ class ModelEvaluator:
                 'Accuracy': [accuracy],
                 'Error Rate': [error_rate],
                 'Specificity': [specificity],
-                'Geometric Mean': [geometric_mean]
+                'Geometric Mean': [g_mean]
             })
             results_df.to_excel('output/validation_results.xlsx', index=False)
 
             # Plot delle performance
-            plt.bar(['Accuracy', 'Error Rate', 'Specificity', 'Geometric Mean'], [accuracy, error_rate, specificity, geometric_mean])
+            plt.bar(['Accuracy', 'Error Rate', 'Specificity', 'Geometric Mean'], [accuracy, error_rate, specificity, g_mean])
             plt.title('Holdout Evaluation Metrics')
             plt.ylabel('Metric Value')
             plt.savefig('output/holdout_evaluation_plot.png')
