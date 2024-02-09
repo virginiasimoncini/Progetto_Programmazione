@@ -30,7 +30,8 @@ if validation_type == 'holdout':
     print("2. Error Rate")
     print("3. Specificity")
     print("4. Geometric Mean")
-    print("5. Tutte le Metriche")
+    print("5. Sensitivity")
+    print("6. Tutte le Metriche")
 
     metric_choice = input("Inserisci il numero corrispondente all'opzione desiderata: ")
 
