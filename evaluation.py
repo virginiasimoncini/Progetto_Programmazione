@@ -72,7 +72,8 @@ class ModelEvaluator:
         return accuracy, error_rate, specificity, g_mean
 
 
-    def evaluate_validation(self, metric_choice):
+
+    def evaluate_validation(self, metric_choice=None):
         if not os.path.exists("output"):
             os.makedirs("output")
 
@@ -116,10 +117,6 @@ class ModelEvaluator:
             plt.savefig(f'output/{metric_name.lower().replace(" ", "_")}_evaluation_plot.png')
             plt.show()
 
-        elif isinstance(self.validation, XXCrossValidation):
-            # La logica per la cross-validation può essere adattata in modo simile
-            # Se desideri implementare la stessa scelta di metrica per la cross-validation
-            pass
 
         elif isinstance(self.validation, XXCrossValidation):
             accuracies = []

@@ -29,21 +29,22 @@ if validation_type == 'holdout':
     print("Scegli la metrica da validare:")
     print("1. Accuracy Rate")
     print("2. Error Rate")
-    print("3. Sensitivity")
-    print("4. Specificity")
-    print("5. Geometric Mean")
+    print("3. Specificity")
+    print("4. Geometric Mean")
 
     metric_choice = input("Inserisci il numero corrispondente all'opzione desiderata: ")
 
+    # Mappa la scelta dell'utente a una metrica
     metric_mapping = {
         '1': 'accuracy',
         '2': 'error_rate',
         '3': 'specificity',
         '4': 'geometric_mean',
     }
-    metrics_to_validate = [metric_mapping.get(metric_choice)]
+    selected_metric = metric_mapping.get(metric_choice)
 
-    evaluator.evaluate_validation(metrics=metrics_to_validate)
+    # Valida solo la metrica selezionata
+    evaluator.evaluate_validation(metric=selected_metric)
 else:
     num_folds = int(input("Inserisci il numero di folds per la cross-validation: "))
     validation = XXCrossValidation(num_folds=num_folds)
@@ -51,5 +52,4 @@ else:
     evaluator = ModelEvaluator(X, y, validation=validation, k=k_neighbors)
 
     # Chiedi all'utente di selezionare la metrica (per ora solo accuracy in cross-validation)
-    metrics_to_validate = ['accuracy']
-    evaluator.evaluate_validation(metrics=metrics_to_validate)
+    evaluator.evaluate_validation()
