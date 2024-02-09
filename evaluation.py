@@ -71,7 +71,7 @@ class ModelEvaluator:
 
         return accuracy, error_rate, specificity, g_mean
 
-    def evaluate_validation(self):
+    def evaluate_validation(self, metrics=None):
         if not os.path.exists("output"):
             os.makedirs("output")
 
