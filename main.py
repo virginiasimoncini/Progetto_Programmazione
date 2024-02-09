@@ -25,7 +25,6 @@ if validation_type == 'holdout':
     validation = Holdout(test_size=0.2)
     evaluator = ModelEvaluator(X, y, validation=validation, k=k_neighbors)
 
-    # Chiedi all'utente di selezionare la metrica
     print("Scegli la metrica da validare:")
     print("1. Accuracy Rate")
     print("2. Error Rate")
@@ -51,6 +50,7 @@ if validation_type == 'holdout':
 
     # Valida le metriche selezionate
     evaluator.evaluate_validation(metrics=metrics_to_validate)
+
 else:
     num_folds = int(input("Inserisci il numero di folds per la cross-validation: "))
     validation = XXCrossValidation(num_folds=num_folds)
