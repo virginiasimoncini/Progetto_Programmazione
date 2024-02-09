@@ -18,9 +18,11 @@ class KNNClassifier:
         # Calcola la distanza euclidea tra due vettori
         return np.sqrt(np.sum((x1 - x2) ** 2))
 
-    def predict(self, X):
+    def predict(self, X_test):
+        if len(X_test) == 0:
+            print("Input array X_test è vuoto")
         y_predictions = [] # Lista dove verranno salvate le previsioni
-        for _, test_point in X.iterrows(): 
+        for _, test_point in X_test.iterrows(): 
             distances = [] # Elenco delle distanze tra il punto x_test e i punti X
             for index, train_point in self.X_train.iterrows():
                 # Calcola le distanze tra il dato di x_test e i dati di X
