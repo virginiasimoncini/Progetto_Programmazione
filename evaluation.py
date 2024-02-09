@@ -73,7 +73,7 @@ class ModelEvaluator:
 
 
 
-    def evaluate_validation(self, metric_choice=None):
+    def evaluate_validation(self, metric=None):
         if not os.path.exists("output"):
             os.makedirs("output")
 
@@ -81,40 +81,32 @@ class ModelEvaluator:
             train_set, test_set = self.validation.split(pd.concat([self.X, self.y], axis=1))
             accuracy, error_rate, specificity, g_mean = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
 
-            print("Holdout Evaluation:")
-            if metric_choice == '1':
-                print(f"Accuracy: {accuracy:.4f}")
-                metric_name = 'Accuracy'
-                metric_value = accuracy
-            elif metric_choice == '2':
-                print(f"Error Rate: {error_rate:.4f}")
-                metric_name = 'Error Rate'
-                metric_value = error_rate
-            elif metric_choice == '3':
-                print(f"Specificity: {specificity:.4f}")
-                metric_name = 'Specificity'
-                metric_value = specificity
-            elif metric_choice == '4':
-                print(f"Geometric Mean: {g_mean:.4f}")
-                metric_name = 'Geometric Mean'
-                metric_value = g_mean
+            if metric == 'accuracy':
+                print(f"Holdout Evaluation - {metric.capitalize()}: {accuracy:.4f}")
+            elif metric == 'error_rate':
+                print(f"Holdout Evaluation - {metric.capitalize()}: {error_rate:.4f}")
+            elif metric == 'specificity':
+                print(f"Holdout Evaluation - {metric.capitalize()}: {specificity:.4f}")
+            elif metric == 'geometric_mean':
+                print(f"Holdout Evaluation - {metric.capitalize()}: {g_mean:.4f}")
             else:
-                print("Opzione non valida.")
-                return
+                print("Metrica non valida.")
 
-            # Salvataggio della metrica scelta in Excel
+            # Salvataggio dei risultati in Excel
             results_df = pd.DataFrame({
                 'Validation Type': ['Holdout'],
-                'Metric': [metric_name],
-                'Value': [metric_value],
+                'Accuracy': [accuracy],
+                'Error Rate': [error_rate],
+                'Specificity': [specificity],
+                'Geometric Mean': [g_mean]
             })
             results_df.to_excel('output/validation_results.xlsx', index=False)
 
-            # Plot della performance
-            plt.bar([metric_name], [metric_value])
+            # Plot delle performance
+            plt.bar(['Accuracy', 'Error Rate', 'Specificity', 'Geometric Mean'], [accuracy, error_rate, specificity, g_mean])
             plt.title('Holdout Evaluation Metrics')
             plt.ylabel('Metric Value')
-            plt.savefig(f'output/{metric_name.lower().replace(" ", "_")}_evaluation_plot.png')
+            plt.savefig('output/holdout_evaluation_plot.png')
             plt.show()
 
 
