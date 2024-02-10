@@ -19,7 +19,7 @@ def main():
     validation_type = input("Choose validation type (holdout/xx): ").lower()
     while validation_type not in ['holdout', 'xx']:
         print("Invalid choice. Choose between 'holdout' and 'xx'.")
-        validation_type = input("Choose validation type (holdout/xx): ")
+        validation_type = input("Choose validation type (holdout/xx): ".lower())
 
     # Choose metrics to validate
     metrics_to_validate = select_metrics()
@@ -27,10 +27,9 @@ def main():
     # Initialize Model Evaluator
     evaluator = ModelEvaluation(X, y, k_neighbors, validation_type, params={}, chosen_metrics=metrics_to_validate)
 
-    # Perform validation and get results
-    evaluator.evaluate_model()
+    # Perform validation and get results3
 
-    accuracy, error_rate, sensibility, specificity, geometric_mean = evaluator.get_metrics()
+    accuracy, error_rate, sensibility, specificity, geometric_mean = evaluator.evaluate_model()
 
     # Print the metrics
     print_metrics(accuracy, error_rate, sensibility, specificity, geometric_mean)

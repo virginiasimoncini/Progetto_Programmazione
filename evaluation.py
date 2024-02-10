@@ -15,10 +15,10 @@ class ModelEvaluation:
         self.chosen_metrics = chosen_metrics
 
     def evaluate_model(self):
-        if self.evaluation_method == 'Holdout':
-            self.holdout_validation()
-        elif self.evaluation_method == 'CrossValidation':
-            self.cross_validation()
+        if self.evaluation_method == 'holdout':
+            return self.holdout_validation()
+        elif self.evaluation_method == 'xx':
+            return self.cross_validation()
 
     def holdout_validation(self):
         training_perc = self.params.get('training_perc', 70)
@@ -29,11 +29,8 @@ class ModelEvaluation:
 
         accuracy, error_rate, sensibility, specificity, geometric_mean = self.__metrics_calculation(y_test, predictions)
 
-        self.__save_metrics([accuracy, error_rate, sensibility, specificity, geometric_mean])
+        return accuracy, error_rate, sensibility, specificity, geometric_mean
 
-    def get_metrics(self):
-        return self.accuracy, self.error_rate, self.sensibility, self.specificity, self.geometric_mean
-    
     def cross_validation(self):
         k_iterations = self.params.get('k_iterations', 5)
 
@@ -63,9 +60,8 @@ class ModelEvaluation:
         specificity_mean = np.mean(specificity_scores)
         geometric_mean_mean = np.mean(geometric_mean_scores)
 
-        self.__save_metrics([accuracy_mean, error_rate_mean, sensibility_mean, specificity_mean, geometric_mean_mean])
+        return accuracy, error_rate, sensibility, specificity, geometric_mean
 
-        self.__metrics_plot(accuracy_scores, error_rate_scores, sensibility_scores, specificity_scores, geometric_mean_scores)
 
     def split(self, df, target_column, test_size=0.3, random_state=None):
         np.random.seed(random_state)
