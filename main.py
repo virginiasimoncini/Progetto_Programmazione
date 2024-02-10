@@ -16,23 +16,25 @@ def main():
     k_neighbors = int(input("Enter the number of neighbors (k): "))
     
     # Choose validation type
-    validation_type = input("Choose validation type (holdout/xx): ").lower()
+    validation_type = ""
     while validation_type not in ['holdout', 'xx']:
         print("Invalid choice. Choose between 'holdout' and 'xx'.")
         validation_type = input("Choose validation type (holdout/xx): ".lower())
 
-    # Choose metrics to validate
-    metrics_to_validate = select_metrics()
-
     # Initialize Model Evaluator
-    evaluator = ModelEvaluation(X, y, k_neighbors, validation_type, params={}, chosen_metrics=metrics_to_validate)
-
-    # Perform validation and get results3
-
-    accuracy, error_rate, sensibility, specificity, geometric_mean = evaluator.evaluate_model()
-
+    method = validation_type=="holdout"
+    evaluator = ModelEvaluation(X, y,method)
+    # Split
+    var = select_var()
+    x_train,y_train,x_test,y_test = evaluator.split(X,y,var)
+    # Evaluate
+    choice = select_metrics()
+    df_evaluation = evaluator.evaluate(x_train,y_train,x_test,y_test,choice)
+    df_mean_evaluation = evaluator.meanCalc(df_evaluation)
     # Print the metrics
-    print_metrics(accuracy, error_rate, sensibility, specificity, geometric_mean)
+    evaluator.printMetrics(df_evaluation)
+    evaluator.save_metrics(df_evaluation)
+    evaluator.metrics_plot(df_evaluation)
 
 
 def select_metrics():
@@ -44,35 +46,30 @@ def select_metrics():
     print("5. Geometric Mean")
     
     metric_choice = input("Enter the number corresponding to the desired option (e.g., '1' for Accuracy Rate): ")
+ 
 
-    metrics_mapping = {
-        '1': 'Accuracy Rate',
-        '2': 'Error Rate',
-        '3': 'Sensibility',
-        '4': 'Specificity',
-        '5': 'Geometric Mean',
-        'accuracy': 'Accuracy Rate',
-        'error rate': 'Error Rate',
-        'sensibility': 'Sensitivity',
-        'specificity': 'Specificity',
-        'geometric mean': 'Geometric Mean',
-    }  
-
-    if metric_choice in metrics_mapping:
-        metrics_to_validate = [metrics_mapping[metric_choice]]
-    else:
+    if not metric_choice in metrics_mapping:
         print("Invalid choice. Exiting program.")
         sys.exit()
 
     return metrics_to_validate
 
-def print_metrics(accuracy_rate, error_rate, sensitivity, specificity, geometric_mean):
-    print("Metrics:")
-    print(f"Accuracy Rate: {accuracy_rate}")
-    print(f"Error Rate: {error_rate}")
-    print(f"Sensitivity: {sensitivity}")
-    print(f"Specificity: {specificity}")
-    print(f"Geometric Mean: {geometric_mean}")
+def select_var():
+    print("Choose metrics to validate:")
+    print("1. Accuracy Rate")
+    print("2. Error Rate")
+    print("3. Sensibility")
+    print("4. Specificity")
+    print("5. Geometric Mean")
+    
+    metric_choice = input("Enter the number corresponding to the desired option (e.g., '1' for Accuracy Rate): ")
+ 
+
+    if not metric_choice in metrics_mapping:
+        print("Invalid choice. Exiting program.")
+        sys.exit()
+
+    return metrics_to_validate
 
 if __name__ == "__main__":
     main()

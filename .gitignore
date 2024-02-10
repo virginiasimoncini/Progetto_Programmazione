@@ -1,4 +1,5 @@
 env/
 output/
+.vscode/
 __pycache__/
 breast_cancer.csv
