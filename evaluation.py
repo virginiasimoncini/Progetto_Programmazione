@@ -1,158 +1,156 @@
-import os
-import numpy as np
+# Classe ModelEvaluation
 import pandas as pd
-from fetching import data_preprocessing
-from knn import KNNClassifier
+import numpy as np
 import matplotlib.pyplot as plt
+from knn import KNNClassifier  # Assicurati di avere l'import corretto per il tuo algoritmo KNN
 
-metric_mapping = [
-    'Accuracy',
-    'Error Rate',
-    'Specificity',
-    'Geometric Mean',
-    'Sensibility',
-]
+class ModelEvaluation:
+    def __init__(self, features: pd.DataFrame, target: pd.Series, k: int, evaluation_method: str, params: dict,
+                 chosen_metrics: list):
+        self.features = features
+        self.target = target
+        self.k = k
+        self.evaluation_method = evaluation_method
+        self.params = params
+        self.chosen_metrics = chosen_metrics
 
-class Holdout:
-    def __init__(self, test_size, random_state=None):
-        self.test_size = test_size
-        self.random_state = random_state
+    def evaluate_model(self):
+        if self.evaluation_method == 'Holdout':
+            self.holdout_validation()
+        elif self.evaluation_method == 'CrossValidation':
+            self.cross_validation()
 
-    def split(self, df):
-        np.random.seed(self.random_state)
+    def holdout_validation(self):
+        training_perc = self.params.get('training_perc', 70)
+        X_train, y_train, X_test, y_test = self.split(self.features, self.target, training_perc)
+
+        knn_model = KNNClassifier(self.k, X_train, y_train)
+        predictions = knn_model.model_prediction(X_test)
+
+        accuracy, error_rate, sensibility, specificity, geometric_mean = self.__metrics_calculation(y_test, predictions)
+
+        self.__save_metrics([accuracy, error_rate, sensibility, specificity, geometric_mean])
+
+    def get_metrics(self):
+        return self.accuracy, self.error_rate, self.sensibility, self.specificity, self.geometric_mean
+    
+    def cross_validation(self):
+        k_iterations = self.params.get('k_iterations', 5)
+
+        accuracy_scores = []
+        error_rate_scores = []
+        sensibility_scores = []
+        specificity_scores = []
+        geometric_mean_scores = []
+
+        for _ in range(k_iterations):
+            X_train, y_train, X_test, y_test = self.split(self.features, self.target, 70)
+
+            knn_model = KNNClassifier(self.k, X_train, y_train)
+            predictions = knn_model.model_prediction(X_test)
+
+            accuracy, error_rate, sensibility, specificity, geometric_mean = self.__metrics_calculation(y_test, predictions)
+
+            accuracy_scores.append(accuracy)
+            error_rate_scores.append(error_rate)
+            sensibility_scores.append(sensibility)
+            specificity_scores.append(specificity)
+            geometric_mean_scores.append(geometric_mean)
+
+        accuracy_mean = np.mean(accuracy_scores)
+        error_rate_mean = np.mean(error_rate_scores)
+        sensibility_mean = np.mean(sensibility_scores)
+        specificity_mean = np.mean(specificity_scores)
+        geometric_mean_mean = np.mean(geometric_mean_scores)
+
+        self.__save_metrics([accuracy_mean, error_rate_mean, sensibility_mean, specificity_mean, geometric_mean_mean])
+
+        self.__metrics_plot(accuracy_scores, error_rate_scores, sensibility_scores, specificity_scores, geometric_mean_scores)
+
+    def split(self, df, target_column, test_size=0.3, random_state=None):
+        np.random.seed(random_state)
         shuffled_indices = np.random.permutation(len(df))
-        test_set_size = int(len(df) * self.test_size)
+        test_set_size = int(len(df) * test_size)
         test_indices = shuffled_indices[:test_set_size]
-        train_indices = shuffled_indices[test_set_size:]
+        train_indices = shuffled_indices[test_size:]
 
         train_set = df.iloc[train_indices]
         test_set = df.iloc[test_indices]
 
-        return train_set, test_set
+        # Separare le etichette dai dati
+        X_train = train_set.drop(target_column, axis=1)
+        y_train = train_set[target_column]
 
-class XXCrossValidation:
-    def __init__(self, num_folds):
-        self.num_folds = num_folds
+        X_test = test_set.drop(target_column, axis=1)
+        y_test = test_set[target_column]
 
-    def split(self, df):
-        folds = []
-        np.random.seed(42)
-        indices = np.random.permutation(df.index)
-        features_mixed = df.loc[indices]
-        fold_length = len(df) // self.num_folds
+        return X_train, y_train, X_test, y_test
 
-        for j in range(self.num_folds):
-            test_start, test_end = j * fold_length, (j + 1) * fold_length 
-            test_set = features_mixed.iloc[test_start:test_end]
-            train_set = pd.concat([features_mixed.iloc[:test_start], features_mixed.iloc[test_end:]])
-            folds.append((train_set, test_set))
+    def __metrics_calculation(self, y_test: pd.Series, predictions: list):
+        # Inizializza le variabili che conterranno i valori delle metriche calcolate
+        accuracy= 0
+        error_rate = 0
+        sensibility = 0
+        specificity = 0
+        geometric_mean = 0
 
-        return folds
+        # Calcolo della matrice di confusione
+        true_negative = np.sum((y == pred and pred == 2) for y, pred in zip(y_test.values, predictions))
+        true_positive = np.sum((y == pred and pred == 4) for y, pred in zip(y_test.values, predictions))
+        false_positive = np.sum((y != pred and pred == 4) for y, pred in zip(y_test.values, predictions))
+        false_negative = np.sum((y != pred and pred == 2) for y, pred in zip(y_test.values, predictions))
 
-class ModelEvaluator:
-    def __init__(self, X, y, validation, k=None, num_folds=None):
-        self.X = X
-        self.y = y
-        self.validation = validation
-        self.k = k
-        self.num_folds = num_folds
-        print("Scegli la metrica da validare:")
-        print("1. Accuracy Rate")
-        print("2. Error Rate")
-        print("3. Specificity")
-        print("4. Geometric Mean")
-        print("5. Sensitivity")
-        print("6. Tutte le Metriche")
-        self.choice = int(input("Inserisci il numero corrispondente all'opzione desiderata: "))
-    
-    #keep it
-    def evaluate(self, X_train, X_test, y_train, y_test):
-        knn = KNNClassifier(k=self.k)
-        knn.fit(X_train, y_train)
-        #create a switch for the choice 
-        if isinstance(X_test, pd.DataFrame):
-            y_pred = knn.predict(X_test)
-        else:
-            y_pred = knn.predict(X_test.values)
-
-        accuracy = (y_pred == y_test.values).mean()
-        error_rate = 1 - accuracy
-
-        # Calcolo della specificità
-        true_negative = np.sum((y_pred == 2) & (y_test == 2))
-        false_positive = np.sum((y_pred == 4) & (y_test == 2))
-        specificity = true_negative / (true_negative + false_positive)
+        # Calcolo effettivo delle metriche richieste utilizzando i valori della matrice di confusione precedentemente calcolati
+        if len(y_test) > 0:
+            accuracy= (true_negative + true_positive) / len(y_test)  # Percentuale di predizioni corrette rispetto al totale delle predizioni
+        if len(y_test) > 0:
+            error_rate = (false_positive + false_negative) / len(y_test)  # Percentuale di predizioni errate rispetto al totale delle predizioni
+        if (true_positive + false_negative) != 0:
+            sensibility = true_positive / (true_positive + false_negative)  # Abilità del modello di predire correttamente i valori positivi
         if (true_negative + false_positive) != 0:
-           specificity = true_negative / (true_negative + false_positive)
-        else:
-            specificity = 0  # o un altro valore appropriato
+            specificity = true_negative / (true_negative + false_positive)  # Abilità del modello di predire correttamente i valori negativi
+        if sensibility  != 0 and specificity != 0:
+            geometric_mean = np.sqrt(sensibility  * specificity)  # Media che bilancia i valori positivi e negativi
 
+        return accuracy, error_rate, sensibility , specificity, geometric_mean
 
-        true_positive = np.sum((y_pred == 4) & (y_test == 4))
-        sensitivity = true_positive / np.sum(y_test == 4)
+    def __save_metrics(self, metrics_list: list):
+        metrics_transposed = list(map(list, zip(*metrics_list)))
+        metrics_df = pd.DataFrame(metrics_transposed, columns=['Accuracy', 'Error Rate', 'Sensibility', 'Specificity', 'Geometric Mean'])
+      
+        metrics_df.to_excel('Metrics.xlsx', index=False)
 
-        # Calcolo della geometric mean
-        recall = np.sum((y_pred == 4) & (y_test == 4)) / np.sum(y_test == 4)
-        g_mean = np.sqrt(specificity * recall)
+    def __metrics_plot(self, accuracy: list, error_rate: list, sensibility: list, specificity: list, geometric_mean: list):
+       labels = ['Accuracy', 'Error Rate', 'Sensibility', 'Specificity', 'Geometric Mean']
+       values = [accuracy, error_rate, sensibility, specificity, geometric_mean]
 
-        return accuracy, error_rate, specificity, g_mean, sensitivity
-    #dont
-    def evaluate_validation(self,metrics):
-        if not os.path.exists("output"):
-            os.makedirs("output")
-        if isinstance(self.validation, Holdout):
-            train_set, test_set = self.validation.split(pd.concat([self.X, self.y], axis=1))
-            result = self.evaluate_and_store_results(train_set, test_set,metrics)
-        else:
-            for i, (train_set, test_set) in enumerate(self.validation.split(pd.concat([self.X, self.y], axis=1))):
-                result = self.evaluate_and_store_results(train_set, test_set, metrics, i)
+     # Creazione del grafico delle metriche nel tempo
+       plt.figure(figsize=(10, 5))
 
-        self.calculate_and_print_mean(result,metrics)
+       for label, value in zip(labels, values):
+          plt.plot(value, marker='o', linestyle='solid', linewidth=2, markersize=5, label=label)
 
-        #result['Validation Type'] = ['Mean']
+       plt.legend(loc='upper right')
+       plt.xlabel("Esperimenti")
+       plt.ylabel("Valori")
+       plt.title("Andamento delle Metriche")
+       plt.tight_layout()
 
-        # Save results to Excel
-        self.save_to_excel(result)
+    # Salva il grafico come un'immagine
+       plt.savefig('metrics_plot.png')
 
-        # Plot delle performance
-        self.plot_results(result)
-    #dont
-    def evaluate_and_store_results(self, train_set, test_set, metrics, fold_number=None):
-        accuracy, error_rate, specificity, g_mean, sensitivity = self.evaluate(train_set.iloc[:, :-1], test_set.iloc[:, :-1], train_set.iloc[:, -1], test_set.iloc[:, -1])
-        results=[accuracy,error_rate,specificity,g_mean,sensitivity]
+    # Creazione di un nuovo grafico per il boxplot delle metriche
+       plt.figure(figsize=(10, 5))
+       plt.boxplot(values)
 
-        if fold_number is not None:
-            print(f"{self.validation.__class__.__name__} {fold_number + 1} {metric_mapping[metrics]}: {accuracy:.4f}")
-        else:
-            print(f"{self.validation.__class__.__name__} {metric_mapping[metrics]}: {accuracy:.4f}")
-        return results[metrics]
+       plt.xlabel("Metriche")
+       plt.ylabel("Valori")
+       plt.title("Boxplot delle Metriche")
+       plt.xticks(range(1, len(labels) + 1), labels, rotation=45)
+       plt.tight_layout()
 
-    def calculate_and_print_mean(self, results,metrics):
-        mean_accuracy = np.mean(results)
+    # Salva il boxplot come un'immagine
+    plt.savefig('boxplot_metrics.png')
 
-        print(f"\nMean Evaluation across {self.validation.__class__.__name__}:")
-        print(f"Mean {metric_mapping[metrics]}: {mean_accuracy:.4f}")
-
-    def save_to_excel(self, results):
-        # Verifica e allinea le lunghezze delle colonne
-        lengths = [len(results[col]) for col in results.keys()]
-        max_length = max(lengths)
-
-        for col in results.keys():
-            current_length = len(results[col])
-            if current_length < max_length:
-                results[col] += [np.nan] * (max_length - current_length)
-
-        # Crea il DataFrame
-        results_df = pd.DataFrame(results)
-
-        results_df.to_excel('output/validation_results.xlsx', index=False)
-
-    def plot_results(self, results):
-        # Plot delle performance
-        metrics = ['Accuracy', 'Error Rate', 'Specificity', 'Sensitivity', 'Geometric Mean']
-        plt.bar(metrics, results['Accuracy'])  # Modifica qui per la metrica che vuoi visualizzare
-        plt.title(f'{self.validation.__class__.__name__} Evaluation Metrics')
-        plt.ylabel('Metric Value')
-        plt.savefig(f'output/{self.validation.__class__.__name__.lower()}_evaluation_plot.png')
-        plt.show()
+    # Chiudi i grafici per evitare di visualizzarli in modo interattivo (se necessario)
+    plt.close('all')
