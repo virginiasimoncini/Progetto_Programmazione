@@ -25,7 +25,9 @@ class KNNClassifier:
             distances = sorted(distances, key=itemgetter(0), reverse=False)
 
             # Seleziona le prime k distanze
+            
             k_nearest_neighbors = distances[:self.k]
+            #k_nearest_neighbors = distances[:3]
 
             # Estrae le classi corrispondenti ai k vicini più vicini
             k_neighbor_classes = [neighbor[1] for neighbor in k_nearest_neighbors]
