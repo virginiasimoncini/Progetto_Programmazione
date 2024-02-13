@@ -9,7 +9,7 @@ class KNNClassifier:
         self.X_train = X
         self.y_train = y
 
-    def euclidean_distance(self, x1, x2):
+    def euclidean_distance(self, x1, x2): # Calcolo la distanza euclidea tra due punti
         return np.sqrt(np.sum((x1 - x2) ** 2))
 
     def predict(self, X):
@@ -24,10 +24,9 @@ class KNNClassifier:
             # Ordina le distanze in ordine crescente
             distances = sorted(distances, key=itemgetter(0), reverse=False)
 
-            # Seleziona le prime k distanze
-            
+            # Seleziona le prime k distanze 
             k_nearest_neighbors = distances[:self.k]
-            #k_nearest_neighbors = distances[:3]
+            #ESEMPIO:k_nearest_neighbors = distances[:4]
 
             # Estrae le classi corrispondenti ai k vicini più vicini
             k_neighbor_classes = [neighbor[1] for neighbor in k_nearest_neighbors]
@@ -50,8 +49,8 @@ class KNNClassifier:
                     y_predictions.append(unique_elements[max_index])
                     # Aggiunge la classe corrispondente all'indice trovato alle previsioni
             else:
-                # Se la lista è vuota, gestisci il caso appropriato (ad esempio, nessun vicino trovato)
-                # Aggiungi qui la logica che ritieni opportuna
+                # Se la lista è vuota, gestisci il caso appropriato
+               
                 y_predictions.append(0)  # Esempio: Aggiungi 0 come valore di default
 
         return np.array(y_predictions)  # questa funzione restituisce le previsioni convertite in un array NumPy
