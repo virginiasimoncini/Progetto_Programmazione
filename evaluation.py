@@ -1,4 +1,3 @@
-# Classe ModelEvaluation
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,7 +11,7 @@ class ModelEvaluation:
         self.method = method
 
 #Split del dataset in nei set di training e testing:
-#o In Holdout, seguendo le percentuali specificate.
+#o In Holdout, seguendo le percentuali speciCicate.
     def split(self, x, y, test_size, random_state=None):
         x_train = pd.DataFrame()
         y_train = pd.Series()
@@ -136,8 +135,8 @@ class ModelEvaluation:
         return df_evaluation.mean()
  
     # • Utilizzare le metriche di validazione speciCicate.
-    # • Una volta Finita la validazione del modello. Salva le performance su un File (es. excel) e con un
-    # plot 
+    # • Una volta Finita la validazione del modello. Salvate le performance su un File (es. excel) e con un
+    # plot (decidete voi quale sia il più adatto).
     
     def printMetrics(self, df, selected_metric):
         # Dizionario che mappa le scelte numeriche delle metriche ai loro nomi nelle colonne del DataFrame
@@ -177,17 +176,34 @@ class ModelEvaluation:
     def save_metrics(self, df):
         df.to_csv('output/metrics.csv', index=False)
  
-    def metrics_plot(self, df):
-        # Trasforma il DataFrame per avere metriche come colonne e valori come righe
-        df_melted = df.melt(var_name='Metrics', value_name='Value')
+    def metrics_plot(self, df, selected_metric):
+        # Dizionario che mappa le scelte numeriche delle metriche ai loro nomi nelle colonne del DataFrame
+        metrics_map = {
+            '1': 'accuracy',
+            '2': 'error_rate',
+            '3': 'sensitivity',
+            '4': 'specificity',
+            '5': 'geometric_mean'
+        }
+        # Controlla se l'utente ha selezionato 'tutte le metriche'
+        if selected_metric == '6':
+            # Plotta tutte le metriche come già fatto
+            df_melted = df.melt(var_name='Metrics', value_name='Value')
+        else:
+            # Plotta solo la metrica selezionata
+            metric_name = metrics_map.get(selected_metric)
+            if metric_name and metric_name in df.columns:
+                df_melted = df[[metric_name]].melt(var_name='Metrics', value_name='Value')
+            else:
+                print("Invalid metric selection. No plot will be shown.")
+                return
+        
         plt.figure(figsize=(10, 6))
         sns.barplot(x='Metrics', y='Value', data=df_melted)
         plt.xticks(rotation=45)
         plt.title('Model Performance Metrics')
-        # Salva il grafico in un file nella directory 'output'
-        plt.savefig('output/model_performance_metrics.png')
-        plt.show() 
-        # È importante chiudere la figura dopo averla salvata per evitare sovrapposizioni con futuri plot
+        plt.savefig(f'output/{metric_name}_performance_metrics.png' if selected_metric != '6' else 'output/all_performance_metrics.png')
+        plt.show()
         plt.close()
         
         
