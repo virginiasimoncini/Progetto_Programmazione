@@ -5,7 +5,7 @@ from fetching import data_preprocessing
 import matplotlib.pyplot as plt
 
 def main():
-    # Load and preprocess dataset
+    # Load and preprocess data
     if len(sys.argv) > 1:
         X, y = data_preprocessing(file=sys.argv[1])
     else:
@@ -54,7 +54,7 @@ def main():
     # Stampa, salva e mostra le metriche
     evaluator.printMetrics(df_evaluation_mean, choice)
     evaluator.save_metrics(df_evaluation_mean)
-    evaluator.metrics_plot(df_evaluation_mean)
+    evaluator.metrics_plot(df_evaluation_mean, choice)
 
 
 def select_metrics():
